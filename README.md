@@ -1,56 +1,198 @@
-# Welcome to your Expo app 👋
+# Observer Panel — API Endpoints
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+---
 
-## Get started
+## 1. Login
 
-1. Install dependencies
+**POST** `/auth/login`
 
-   ```bash
-   npm install
-   ```
+```json
+// পাঠাবো
+{
+  "email": "karim@edu.gov.bd",
+  "password": "123456"
+}
 
-2. Start the app
-
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
+// পাবো
+{
+  "token": "eyJhbG...",
+  "observer": {
+    "name": "Md. Abdul Karim",
+    "designation": "Upazila Education Officer",
+    "zone": "Savar Upazila",
+    "level": "upazila"
+  }
+}
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+> `level` হবে এর মধ্যে একটা: `branch` | `principal` | `gm` | `upazila` | `district` | `division`
 
-### Other setup steps
+---
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+## 2. Institute List (School এর তালিকা)
 
-## Learn more
+**GET** `/institutes`
 
-To learn more about developing your project with Expo, look at the following resources:
+```
+// Filter করতে চাইলে এভাবে পাঠাবো (সবগুলো optional)
+?search=savar
+?status=active          → active | inactive | due (due মানে বকেয়া > ১০ লাখ)
+?layer_level=upazila    → কোন layer দিয়ে filter
+?layer_value=Savar      → সেই layer এর value
+```
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+```json
+// পাবো
+{
+  "total": 5,
+  "institutes": [
+    {
+      "id": 1,
+      "name": "Savar Model School & College",
+      "code": "INS-0041",
+      "type": "School & College",
+      "branch": "Savar Branch",
+      "principal": "Principal Office A",
+      "gm": "GM Office North",
+      "upazila": "Savar",
+      "district": "Dhaka",
+      "division": "Dhaka",
+      "mobile": "+880 1711-234567",
+      "email": "savar.model@edu.gov.bd",
+      "totalStudents": 1240,
+      "fee": {
+        "today": 84500,
+        "week": 412000,
+        "month": 1680000,
+        "year": 14320000
+      },
+      "totalPayable": 18600000,
+      "totalCollected": 14320000,
+      "dueAmount": 4280000,
+      "collectionRate": 77,
+      "lastTransaction": "2026-05-21",
+      "lastTransactionTime": "11:42 AM",
+      "status": "active"
+    }
+  ]
+}
+```
 
-## Join the community
+---
 
-Join our community of developers creating universal apps.
+## 3. একটি Institute এর Details
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+**GET** `/institutes/:id`
+
+```json
+// পাবো (উপরের Institute object এর মতোই, একটা institute এর জন্য)
+{
+  "id": 1,
+  "name": "Savar Model School & College",
+  "code": "INS-0041",
+  "type": "School & College",
+  "branch": "Savar Branch",
+  "principal": "Principal Office A",
+  "gm": "GM Office North",
+  "upazila": "Savar",
+  "district": "Dhaka",
+  "division": "Dhaka",
+  "mobile": "+880 1711-234567",
+  "email": "savar.model@edu.gov.bd",
+  "totalStudents": 1240,
+  "fee": {
+    "today": 84500,
+    "week": 412000,
+    "month": 1680000,
+    "year": 14320000
+  },
+  "totalPayable": 18600000,
+  "totalCollected": 14320000,
+  "dueAmount": 4280000,
+  "collectionRate": 77,
+  "lastTransaction": "2026-05-21",
+  "lastTransactionTime": "11:42 AM",
+  "status": "active"
+}
+```
+
+---
+
+## 4. Transaction List (কোন Institute এর লেনদেন)
+
+**GET** `/institutes/:id/transactions`
+
+```
+// Date range filter (optional)
+?from=2026-05-14
+?to=2026-05-21
+```
+
+```json
+// পাবো
+{
+  "totalAmount": 13400,
+  "transactions": [
+    {
+      "id": 1,
+      "student": "Rafi Ahmed",
+      "class": "Class IX",
+      "amount": 2400,
+      "date": "2026-05-21",
+      "time": "11:42 AM",
+      "type": "Tuition Fee",
+      "method": "Cash"
+    },
+    {
+      "id": 2,
+      "student": "Sumaiya Khanam",
+      "class": "Class X",
+      "amount": 1800,
+      "date": "2026-05-21",
+      "time": "11:15 AM",
+      "type": "Exam Fee",
+      "method": "bKash"
+    }
+  ]
+}
+```
+
+> `type` হবে: `Tuition Fee` | `Exam Fee` | `Annual Fee` | `Admission Fee`  
+> `method` হবে: `Cash` | `bKash` | `Rocket` | `Nagad`
+
+---
+
+## Field গুলো কী কী মানে
+
+### Institute এর Fields
+
+| Field                                                               | মানে                                     |
+| ------------------------------------------------------------------- | ---------------------------------------- |
+| `id`                                                                | Unique ID                                |
+| `name`                                                              | School এর নাম                            |
+| `code`                                                              | School কোড (যেমন INS-0041)               |
+| `type`                                                              | School এর ধরন                            |
+| `branch` / `principal` / `gm` / `upazila` / `district` / `division` | Administrative hierarchy                 |
+| `mobile` / `email`                                                  | যোগাযোগ                                  |
+| `totalStudents`                                                     | মোট শিক্ষার্থী                           |
+| `fee.today`                                                         | আজকের collection                         |
+| `fee.week`                                                          | এই সপ্তাহের collection                   |
+| `fee.month`                                                         | এই মাসের collection                      |
+| `fee.year`                                                          | এই বছরের collection                      |
+| `totalPayable`                                                      | মোট পাওনা                                |
+| `totalCollected`                                                    | মোট আদায় হয়েছে                         |
+| `dueAmount`                                                         | বকেয়া (= totalPayable - totalCollected) |
+| `collectionRate`                                                    | আদায়ের হার % (যেমন 77 মানে ৭৭%)         |
+| `lastTransaction`                                                   | সর্বশেষ লেনদেনের তারিখ                   |
+| `status`                                                            | `active` অথবা `inactive`                 |
+
+---
+
+## গুরুত্বপূর্ণ Notes
+
+- সব টাকার amount **পূর্ণ সংখ্যা** (BDT, কোনো দশমিক নেই)
+- `collectionRate` backend থেকে calculate করে পাঠাবে: `(totalCollected / totalPayable) * 100`
+- `fee.today/week/month/year` — backend থেকে aggregate করে পাঠাবে
+- **Observer এর `level` অনুযায়ী data scope করতে হবে** — যেমন `upazila` level এর observer শুধু তার upazila এর institute দেখবে
+- সব date format হবে `YYYY-MM-DD`
+- Login ছাড়া বাকি সব request-এ Header দিতে হবে: `Authorization: Bearer <token>`
