@@ -83,6 +83,9 @@ Authorization: Bearer <token>
       "name": "Savar Model College",
       "code": "INS-1001",
       "type": "College",
+      "branch": "Savar Branch",
+      "principal": "PO Dhaka West",
+      "gm": "GM Dhaka",
       "upazila": "Savar",
       "district": "Dhaka",
       "division": "Dhaka",
@@ -120,6 +123,9 @@ Authorization: Bearer <token>
   "name": "Savar Model College",
   "code": "INS-1001",
   "type": "College",
+  "branch": "Savar Branch",
+  "principal": "PO Dhaka West",
+  "gm": "GM Dhaka",
   "upazila": "Savar",
   "district": "Dhaka",
   "division": "Dhaka",
@@ -206,6 +212,9 @@ Authorization: Bearer <token>
 | `name` | string | Institute এর নাম |
 | `code` | string | Institute কোড, যেমন `INS-1001` |
 | `type` | string | ধরন: `College` \| `High School` \| `School & College` \| `Primary School` \| `Technical` |
+| `branch` | string | Branch Office এর নাম (যেমন `Savar Branch`) |
+| `principal` | string | Principal Office এর নাম (যেমন `PO Dhaka West`) |
+| `gm` | string | GM Office এর নাম (যেমন `GM Dhaka`) |
 | `upazila` | string | উপজেলার নাম (যেমন `Savar`) |
 | `district` | string | জেলার নাম (যেমন `Dhaka`) |
 | `division` | string | বিভাগের নাম (যেমন `Dhaka`) |
