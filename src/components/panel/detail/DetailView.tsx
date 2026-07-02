@@ -3,7 +3,6 @@ import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-nati
 import type { Institute } from '@/types';
 import { DetailHero } from './DetailHero';
 import { OverviewTab } from './tabs/OverviewTab';
-import { TransactionsTab } from './tabs/TransactionsTab';
 import { SummaryTab } from './tabs/SummaryTab';
 import { DateToDateTab } from './tabs/DateToDateTab';
 
@@ -12,11 +11,10 @@ interface DetailViewProps {
   onBack: () => void;
 }
 
-type TabId = 'overview' | 'transactions' | 'summary' | 'date2date';
+type TabId = 'overview' | 'summary' | 'date2date';
 
 const TABS: { id: TabId; label: string }[] = [
   { id: 'overview', label: 'Overview' },
-  { id: 'transactions', label: 'Transactions' },
   { id: 'summary', label: 'Summary' },
   { id: 'date2date', label: 'Date to Date' },
 ];
@@ -69,7 +67,6 @@ export function DetailView({ inst, onBack }: DetailViewProps) {
         keyboardShouldPersistTaps="handled"
       >
         {activeTab === 'overview' && <OverviewTab inst={inst} />}
-        {activeTab === 'transactions' && <TransactionsTab />}
         {activeTab === 'summary' && <SummaryTab inst={inst} />}
         {activeTab === 'date2date' && <DateToDateTab />}
         <View style={{ height: 24 }} />

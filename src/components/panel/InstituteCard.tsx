@@ -46,8 +46,8 @@ export function InstituteCard({ inst, periodIdx, onPress }: InstituteCardProps) 
       {/* Stats row */}
       <View style={styles.statsRow}>
         {[
-          { label: 'Total Collected', value: fmt(inst.totalCollected), red: false },
           { label: 'Total Payable', value: fmt(inst.totalPayable), red: false },
+          { label: 'Total Collected', value: fmt(inst.totalCollected), red: false },
           { label: 'Due', value: fmt(inst.dueAmount), red: true },
         ].map((s, i) => (
           <View key={i} style={styles.statCell}>

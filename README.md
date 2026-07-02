@@ -1,75 +1,104 @@
-# Observer Panel — API Endpoints
+# Observer Panel — Backend API Documentation
+
+> এই document টি Backend Developer এর জন্য। এখানে Observer Panel Mobile App এর জন্য সমস্ত প্রয়োজনীয় API endpoint এর বিস্তারিত বিবরণ দেওয়া আছে।
 
 ---
 
-## 1. Login
+## Base URL
+
+```
+https://api.yourdomain.com/v1
+```
+
+## Authentication
+
+Login ছাড়া **সব request** এ নিচের Header পাঠাতে হবে:
+
+```
+Authorization: Bearer <token>
+```
+
+---
+
+## API Endpoints
+
+---
+
+### 1. Login
 
 **POST** `/auth/login`
 
+**Request Body:**
 ```json
-// পাঠাবো
 {
   "email": "karim@edu.gov.bd",
   "password": "123456"
 }
+```
 
-// পাবো
+**Response:**
+```json
 {
-  "token": "eyJhbG...",
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
   "observer": {
     "name": "Md. Abdul Karim",
-    "designation": "Upazila Education Officer",
-    "zone": "Savar Upazila",
-    "level": "upazila"
+    "designation": "Division Director",
+    "zone": "Dhaka Division",
+    "level": "division"
   }
 }
 ```
 
-> `level` হবে এর মধ্যে একটা: `branch` | `principal` | `gm` | `upazila` | `district` | `division`
+> **`level`** এর সম্ভাব্য মান: `"division"` | `"district"` | `"upazila"`
+
+> **গুরুত্বপূর্ণ:** Observer এর `level` অনুযায়ী backend **data scope** করবে।
+> - `division` level → শুধু তার division এর সব institute দেখবে
+> - `district` level → শুধু তার district এর institute দেখবে
+> - `upazila` level → শুধু তার upazila এর institute দেখবে
 
 ---
 
-## 2. Institute List (School এর তালিকা)
+### 2. Institute List (School এর তালিকা)
 
 **GET** `/institutes`
 
-```
-// Filter করতে চাইলে এভাবে পাঠাবো (সবগুলো optional)
-?search=savar
-?status=active          → active | inactive | due (due মানে বকেয়া > ১০ লাখ)
-?layer_level=upazila    → কোন layer দিয়ে filter
-?layer_value=Savar      → সেই layer এর value
-```
+**Query Parameters (সবগুলো optional):**
 
+| Parameter | Type | Example | বিবরণ |
+|---|---|---|---|
+| `search` | string | `savar` | নাম বা code দিয়ে search |
+| `status` | string | `active` | `active` \| `inactive` \| `due` |
+| `layer_level` | string | `division` | Filter কোন layer দিয়ে |
+| `layer_value` | string | `Dhaka` | সেই layer এর value |
+
+> `status=due` মানে যেসব institute এর `dueAmount > 1,000,000 (১০ লাখ)`
+
+**Response:**
 ```json
-// পাবো
 {
-  "total": 5,
+  "total": 12,
   "institutes": [
     {
       "id": 1,
-      "name": "Savar Model School & College",
-      "code": "INS-0041",
-      "type": "School & College",
-      "branch": "Savar Branch",
-      "principal": "Principal Office A",
-      "gm": "GM Office North",
+      "name": "Savar Model College",
+      "code": "INS-1001",
+      "type": "College",
       "upazila": "Savar",
       "district": "Dhaka",
       "division": "Dhaka",
       "mobile": "+880 1711-234567",
       "email": "savar.model@edu.gov.bd",
-      "totalStudents": 1240,
+      "totalStudents": 1540,
       "fee": {
-        "today": 84500,
-        "week": 412000,
-        "month": 1680000,
-        "year": 14320000
+        "today": 85000,
+        "week": 420000,
+        "month": 1700000,
+        "year": 14500000
       },
-      "totalPayable": 18600000,
-      "totalCollected": 14320000,
-      "dueAmount": 4280000,
-      "collectionRate": 77,
+      "totalPayable": 18500000,
+      "totalCollected": 14500000,
+      "dueAmount": 4000000,
+      "collectionRate": 78,
       "lastTransaction": "2026-05-21",
       "lastTransactionTime": "11:42 AM",
       "status": "active"
@@ -80,36 +109,33 @@
 
 ---
 
-## 3. একটি Institute এর Details
+### 3. একটি Institute এর Details
 
 **GET** `/institutes/:id`
 
+**Response:**
 ```json
-// পাবো (উপরের Institute object এর মতোই, একটা institute এর জন্য)
 {
   "id": 1,
-  "name": "Savar Model School & College",
-  "code": "INS-0041",
-  "type": "School & College",
-  "branch": "Savar Branch",
-  "principal": "Principal Office A",
-  "gm": "GM Office North",
+  "name": "Savar Model College",
+  "code": "INS-1001",
+  "type": "College",
   "upazila": "Savar",
   "district": "Dhaka",
   "division": "Dhaka",
   "mobile": "+880 1711-234567",
   "email": "savar.model@edu.gov.bd",
-  "totalStudents": 1240,
+  "totalStudents": 1540,
   "fee": {
-    "today": 84500,
-    "week": 412000,
-    "month": 1680000,
-    "year": 14320000
+    "today": 85000,
+    "week": 420000,
+    "month": 1700000,
+    "year": 14500000
   },
-  "totalPayable": 18600000,
-  "totalCollected": 14320000,
-  "dueAmount": 4280000,
-  "collectionRate": 77,
+  "totalPayable": 18500000,
+  "totalCollected": 14500000,
+  "dueAmount": 4000000,
+  "collectionRate": 78,
   "lastTransaction": "2026-05-21",
   "lastTransactionTime": "11:42 AM",
   "status": "active"
@@ -118,20 +144,27 @@
 
 ---
 
-## 4. Transaction List (কোন Institute এর লেনদেন)
+### 4. Date-to-Date Transaction Report
+
+> এই API টি Institute Detail page এর **"Date to Date"** tab এ ব্যবহার হয়।
+> নির্দিষ্ট তারিখ সীমার মধ্যে student-wise payment list দেখায়।
 
 **GET** `/institutes/:id/transactions`
 
-```
-// Date range filter (optional)
-?from=2026-05-14
-?to=2026-05-21
-```
+**Query Parameters:**
 
+| Parameter | Type | Required | Example | বিবরণ |
+|---|---|---|---|---|
+| `from` | string | হ্যাঁ | `2026-05-14` | শুরুর তারিখ (YYYY-MM-DD) |
+| `to` | string | হ্যাঁ | `2026-05-21` | শেষ তারিখ (YYYY-MM-DD) |
+
+**Response:**
 ```json
-// পাবো
 {
+  "from": "2026-05-14",
+  "to": "2026-05-21",
   "totalAmount": 13400,
+  "count": 5,
   "transactions": [
     {
       "id": 1,
@@ -157,42 +190,85 @@
 }
 ```
 
-> `type` হবে: `Tuition Fee` | `Exam Fee` | `Annual Fee` | `Admission Fee`  
-> `method` হবে: `Cash` | `bKash` | `Rocket` | `Nagad`
+> **`type`** এর সম্ভাব্য মান: `"Tuition Fee"` | `"Exam Fee"` | `"Annual Fee"` | `"Admission Fee"`
+
+> **`method`** এর সম্ভাব্য মান: `"Cash"` | `"bKash"` | `"Rocket"` | `"Nagad"`
 
 ---
 
-## Field গুলো কী কী মানে
+## Data Field গুলোর বিবরণ
 
-### Institute এর Fields
+### Institute Object
 
-| Field                                                               | মানে                                     |
-| ------------------------------------------------------------------- | ---------------------------------------- |
-| `id`                                                                | Unique ID                                |
-| `name`                                                              | School এর নাম                            |
-| `code`                                                              | School কোড (যেমন INS-0041)               |
-| `type`                                                              | School এর ধরন                            |
-| `branch` / `principal` / `gm` / `upazila` / `district` / `division` | Administrative hierarchy                 |
-| `mobile` / `email`                                                  | যোগাযোগ                                  |
-| `totalStudents`                                                     | মোট শিক্ষার্থী                           |
-| `fee.today`                                                         | আজকের collection                         |
-| `fee.week`                                                          | এই সপ্তাহের collection                   |
-| `fee.month`                                                         | এই মাসের collection                      |
-| `fee.year`                                                          | এই বছরের collection                      |
-| `totalPayable`                                                      | মোট পাওনা                                |
-| `totalCollected`                                                    | মোট আদায় হয়েছে                         |
-| `dueAmount`                                                         | বকেয়া (= totalPayable - totalCollected) |
-| `collectionRate`                                                    | আদায়ের হার % (যেমন 77 মানে ৭৭%)         |
-| `lastTransaction`                                                   | সর্বশেষ লেনদেনের তারিখ                   |
-| `status`                                                            | `active` অথবা `inactive`                 |
+| Field | Type | বিবরণ |
+|---|---|---|
+| `id` | integer | Unique Institute ID |
+| `name` | string | Institute এর নাম |
+| `code` | string | Institute কোড, যেমন `INS-1001` |
+| `type` | string | ধরন: `College` \| `High School` \| `School & College` \| `Primary School` \| `Technical` |
+| `upazila` | string | উপজেলার নাম (যেমন `Savar`) |
+| `district` | string | জেলার নাম (যেমন `Dhaka`) |
+| `division` | string | বিভাগের নাম (যেমন `Dhaka`) |
+| `mobile` | string | Mobile নম্বর |
+| `email` | string | Email address |
+| `totalStudents` | integer | মোট শিক্ষার্থী সংখ্যা |
+| `fee.today` | integer | আজকের মোট collection (BDT) |
+| `fee.week` | integer | এই সপ্তাহের মোট collection (BDT) |
+| `fee.month` | integer | এই মাসের মোট collection (BDT) |
+| `fee.year` | integer | এই বছরের মোট collection (BDT) |
+| `totalPayable` | integer | মোট পাওনা (BDT) |
+| `totalCollected` | integer | মোট আদায় হয়েছে (BDT) |
+| `dueAmount` | integer | বকেয়া = `totalPayable - totalCollected` (BDT) |
+| `collectionRate` | integer | আদায়ের হার % — formula: `round((totalCollected / totalPayable) * 100)` |
+| `lastTransaction` | string | সর্বশেষ লেনদেনের তারিখ, format: `YYYY-MM-DD` |
+| `lastTransactionTime` | string | সর্বশেষ লেনদেনের সময়, format: `hh:mm AM/PM` |
+| `status` | string | `"active"` অথবা `"inactive"` |
+
+### Transaction Object
+
+| Field | Type | বিবরণ |
+|---|---|---|
+| `id` | integer | Unique Transaction ID |
+| `student` | string | শিক্ষার্থীর নাম |
+| `class` | string | শ্রেণী, যেমন `Class IX` |
+| `amount` | integer | পরিশোধিত পরিমাণ (BDT) |
+| `date` | string | তারিখ, format: `YYYY-MM-DD` |
+| `time` | string | সময়, format: `hh:mm AM/PM` |
+| `type` | string | ফি এর ধরন |
+| `method` | string | পরিশোধের মাধ্যম |
+
+---
+
+## Administrative Hierarchy
+
+App টিতে বর্তমানে ৩-স্তরের hierarchy আছে:
+
+```
+Division  (বিভাগ)
+  └── District  (জেলা)
+        └── Upazila  (উপজেলা)
+```
+
+**বর্তমানে যেসব Division আছে:**
+- `Dhaka` → Districts: `Dhaka`, `Gazipur`
+- `Rajshahi` → Districts: `Rajshahi`, `Bogura`
+- `Chittagong` → Districts: `Chittagong`, `Cox's Bazar`
+
+**Layer Filter Logic:**
+- App থেকে `layer_level` এবং `layer_value` পাঠানো হলে সেই অনুযায়ী filter করতে হবে
+  - `layer_level=division&layer_value=Dhaka` → শুধু Dhaka division এর institutes
+  - `layer_level=district&layer_value=Gazipur` → শুধু Gazipur district এর institutes
+  - `layer_level=upazila&layer_value=Savar` → শুধু Savar upazila এর institutes
 
 ---
 
 ## গুরুত্বপূর্ণ Notes
 
-- সব টাকার amount **পূর্ণ সংখ্যা** (BDT, কোনো দশমিক নেই)
-- `collectionRate` backend থেকে calculate করে পাঠাবে: `(totalCollected / totalPayable) * 100`
-- `fee.today/week/month/year` — backend থেকে aggregate করে পাঠাবে
-- **Observer এর `level` অনুযায়ী data scope করতে হবে** — যেমন `upazila` level এর observer শুধু তার upazila এর institute দেখবে
-- সব date format হবে `YYYY-MM-DD`
-- Login ছাড়া বাকি সব request-এ Header দিতে হবে: `Authorization: Bearer <token>`
+1. সব টাকার amount **পূর্ণ সংখ্যা** (BDT integer), কোনো দশমিক নেই
+2. `collectionRate` backend থেকে calculate করে পাঠাবে: `round((totalCollected / totalPayable) * 100)`
+3. `fee.today / fee.week / fee.month / fee.year` — backend থেকে aggregate করে পাঠাবে
+4. **Observer এর `level` অনুযায়ী data scope করতে হবে** — observer এর level এর উপরে data দেখাবে না
+5. সব date format হবে `YYYY-MM-DD`
+6. Login ছাড়া বাকি সব request এ Header: `Authorization: Bearer <token>`
+7. `status=due` filter এর জন্য threshold: `dueAmount > 1000000` (১০ লাখ টাকা)
+8. `lastTransactionTime` format হবে `hh:mm AM/PM` (যেমন `11:42 AM`)
