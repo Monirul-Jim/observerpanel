@@ -34,7 +34,7 @@ export function FilterBar({
   return (
     <View className="border-b border-slate-200 bg-white px-4 pb-1 pt-3 dark:border-slate-700 dark:bg-slate-800">
       {/* Search */}
-      <View className="mb-2.5 h-[42px] flex-row items-center rounded-[10px] border border-slate-200 bg-slate-50 px-3 dark:border-slate-700 dark:bg-slate-900">
+      <View className="mb-2.5 min-h-[42px] flex-row items-center rounded-[10px] border border-slate-200 bg-slate-50 px-3 py-2 dark:border-slate-700 dark:bg-slate-900">
         <Text className="mr-2 text-sm">🔍</Text>
         <TextInput
           className="flex-1 text-[13px] text-slate-900 dark:text-white"

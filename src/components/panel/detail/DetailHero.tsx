@@ -17,14 +17,14 @@ export function DetailHero({ inst }: { inst: Institute }) {
       {/* Contact links */}
       <View style={{ flexDirection: 'row', gap: 8, marginBottom: 14 }}>
         <TouchableOpacity
-          style={styles.contactBtn}
+          style={[styles.contactBtn, { overflow: 'hidden' }]}
           onPress={() => Linking.openURL(`tel:${inst.mobile}`)}
           activeOpacity={0.8}
         >
           <Text style={{ fontSize: 18 }}>📞</Text>
-          <View>
+          <View style={{ flex: 1, minWidth: 0 }}>
             <Text style={styles.contactMeta}>Mobile</Text>
-            <Text style={styles.contactValue}>{inst.mobile}</Text>
+            <Text style={styles.contactValue} numberOfLines={1}>{inst.mobile}</Text>
           </View>
         </TouchableOpacity>
         <TouchableOpacity

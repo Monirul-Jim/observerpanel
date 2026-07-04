@@ -148,57 +148,36 @@ Authorization: Bearer <token>
 }
 ```
 
----
-
-### 4. Date-to-Date Transaction Report
+### 4. Date-wise Collection Summary
 
 > এই API টি Institute Detail page এর **"Date to Date"** tab এ ব্যবহার হয়।
-> নির্দিষ্ট তারিখ সীমার মধ্যে student-wise payment list দেখায়।
+> নির্দিষ্ট তারিখ সীমার মধ্যে প্রতিদিনের মোট collection (aggregate) দেখায় — student-wise breakdown না।
 
-**GET** `/institutes/:id/transactions`
+**GET** `/observer/institutes/:id/transactions`
 
 **Query Parameters:**
 
 | Parameter | Type | Required | Example | বিবরণ |
 |---|---|---|---|---|
-| `from` | string | হ্যাঁ | `2026-05-14` | শুরুর তারিখ (YYYY-MM-DD) |
-| `to` | string | হ্যাঁ | `2026-05-21` | শেষ তারিখ (YYYY-MM-DD) |
+| `from` | string | হ্যাঁ | `2026-01-01` | শুরুর তারিখ (YYYY-MM-DD) |
+| `to` | string | হ্যাঁ | `2027-02-10` | শেষ তারিখ (YYYY-MM-DD) |
 
 **Response:**
 ```json
 {
-  "from": "2026-05-14",
-  "to": "2026-05-21",
-  "totalAmount": 13400,
-  "count": 5,
-  "transactions": [
-    {
-      "id": 1,
-      "student": "Rafi Ahmed",
-      "class": "Class IX",
-      "amount": 2400,
-      "date": "2026-05-21",
-      "time": "11:42 AM",
-      "type": "Tuition Fee",
-      "method": "Cash"
-    },
-    {
-      "id": 2,
-      "student": "Sumaiya Khanam",
-      "class": "Class X",
-      "amount": 1800,
-      "date": "2026-05-21",
-      "time": "11:15 AM",
-      "type": "Exam Fee",
-      "method": "bKash"
-    }
+  "from": "2026-01-01",
+  "to": "2027-02-10",
+  "totalAmount": 2100,
+  "data": [
+    { "date": "2026-01-01", "amount": 2000 },
+    { "date": "2027-02-10", "amount": 100 }
   ]
 }
 ```
 
-> **`type`** এর সম্ভাব্য মান: `"Tuition Fee"` | `"Exam Fee"` | `"Annual Fee"` | `"Admission Fee"`
-
-> **`method`** এর সম্ভাব্য মান: `"Cash"` | `"bKash"` | `"Rocket"` | `"Nagad"`
+> `data` — range এর মধ্যে যেসব তারিখে collection হয়েছে শুধু সেগুলোর entry থাকবে (৳0 collection এর তারিখ বাদ দেওয়া যাবে)।
+> `date` format: `YYYY-MM-DD`, `amount` পূর্ণ সংখ্যা (BDT, কোনো দশমিক নেই)।
+> `totalAmount` — `data` এর সব `amount` এর যোগফল।
 
 ---
 

@@ -22,7 +22,7 @@ export function SummaryTab({ inst }: { inst: Institute }) {
 
   return (
     <View className="overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-700">
-      {rows.map((row, i) => (
+      {rows?.map((row, i) => (
         <View
           key={i}
           className={`flex-row items-center justify-between px-4 py-2.5 ${

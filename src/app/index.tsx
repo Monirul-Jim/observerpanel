@@ -139,7 +139,7 @@ export default function LoginScreen() {
               }}
               render={({ field: { onChange, onBlur, value } }) => (
                 <View
-                  className={`h-[50px] flex-row items-center rounded-xl border-[1.5px] bg-slate-50 px-3.5 ${
+                  className={`min-h-[50px] flex-row items-center rounded-xl border-[1.5px] bg-slate-50 px-3.5 py-2 ${
                     errors.email
                       ? "border-red-500 bg-red-50"
                       : "border-slate-200"
@@ -181,7 +181,7 @@ export default function LoginScreen() {
               }}
               render={({ field: { onChange, onBlur, value } }) => (
                 <View
-                  className={`h-[50px] flex-row items-center rounded-xl border-[1.5px] bg-slate-50 px-3.5 ${
+                  className={`min-h-[50px] flex-row items-center rounded-xl border-[1.5px] bg-slate-50 px-3.5 py-2 ${
                     errors.password
                       ? "border-red-500 bg-red-50"
                       : "border-slate-200"
@@ -219,7 +219,7 @@ export default function LoginScreen() {
 
           {/* Submit */}
           <TouchableOpacity
-            className={`mt-2 h-[52px] items-center justify-center rounded-2xl bg-[#1e3a5f] ${loading ? "opacity-70" : ""}`}
+            className={`mt-2 min-h-[52px] items-center justify-center rounded-2xl bg-[#1e3a5f] px-4 py-3 ${loading ? "opacity-70" : ""}`}
             style={{
               shadowColor: "#1e3a5f",
               shadowOffset: { width: 0, height: 4 },

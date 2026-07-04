@@ -7,10 +7,11 @@ import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
 export default function RootLayout() {
   return (
-    <>
+    <SafeAreaProvider>
       <Provider store={store}>
         <PersistGate persistor={persistor}>
           <ThemeSync />
@@ -25,6 +26,6 @@ export default function RootLayout() {
       </Provider>
       <RichToast ref={(ref) => setRichToastRef(ref)} />
       <UpdateBanner />
-    </>
+    </SafeAreaProvider>
   );
 }
