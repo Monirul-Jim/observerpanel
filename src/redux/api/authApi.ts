@@ -10,6 +10,13 @@ type TInstitutesResponse = {
   };
 };
 
+export type TGetInstitutesParams = {
+  search?: string;
+  status?: string;
+  layer_level?: string;
+  layer_value?: string;
+};
+
 const authApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     loginUser: builder.mutation({
@@ -25,8 +32,11 @@ const authApi = baseApi.injectEndpoints({
         method: "POST",
       }),
     }),
-    getInstituteInfo: builder.query<Institute[], void>({
-      query: () => "/observer/institutes",
+    getInstituteInfo: builder.query<Institute[], TGetInstitutesParams | void>({
+      query: (params) => ({
+        url: "/observer/institutes",
+        params: params ?? undefined,
+      }),
       transformResponse: (res: TInstitutesResponse) =>
         res.payload.data.institutes,
       providesTags: ["Institute"],
