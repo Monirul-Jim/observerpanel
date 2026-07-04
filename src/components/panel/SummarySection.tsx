@@ -1,8 +1,12 @@
-import { View, Text, TouchableOpacity } from 'react-native';
+import { useState } from 'react';
+import { View, Text, TouchableOpacity, Modal, Pressable } from 'react-native';
+import { useRouter } from 'expo-router';
 import type { Institute } from '@/types';
 import { PERIOD_KEYS, PERIOD_LABELS, fmt } from '@/utils/formatters';
 import { OBSERVER } from '@/data/mock-data';
 import { Avatar } from './Avatar';
+import { useAppSelector } from '@/redux/hooks';
+import { useLogout } from '@/redux/feature/useLogout';
 
 interface SummarySectionProps {
   institutes: Institute[];
@@ -14,6 +18,20 @@ const STAT_ICONS = ['📅', '🏫', '✅', '⚠️'] as const;
 const STAT_ACCENTS = ['#4ade80', '#ffffff', '#7dd3fc', '#fca5a5'] as const;
 
 export function SummarySection({ institutes, periodIdx, setPeriodIdx }: SummarySectionProps) {
+  const router = useRouter();
+  const user = useAppSelector((state) => state.auth.user);
+  const { handleLogout: doLogout, loggingOut } = useLogout();
+  const [menuVisible, setMenuVisible] = useState(false);
+
+  const observerName = user?.name ?? OBSERVER.name;
+  const observerDesignation = user?.designation ?? OBSERVER.designation;
+  const observerZone = user?.division ?? OBSERVER.zone;
+
+  const handleLogout = async () => {
+    setMenuVisible(false);
+    await doLogout();
+  };
+
   const totals = institutes.reduce(
     (acc, inst) => ({
       periodFee: acc.periodFee + (inst.fee[PERIOD_KEYS[periodIdx]] as number),
@@ -44,14 +62,81 @@ export function SummarySection({ institutes, periodIdx, setPeriodIdx }: SummaryS
             Observer Panel
           </Text>
           <Text style={{ fontSize: 15, fontWeight: '800', color: '#fff' }}>
-            {OBSERVER.name}
+            {observerName}
           </Text>
           <Text style={{ fontSize: 11, color: 'rgba(255,255,255,0.55)', marginTop: 2 }}>
-            {OBSERVER.designation} · {OBSERVER.zone}
+            {observerDesignation} · {observerZone}
           </Text>
         </View>
-        <Avatar name={OBSERVER.name} size={44} color="#2563eb" />
+        <TouchableOpacity onPress={() => setMenuVisible(true)} activeOpacity={0.8}>
+          <Avatar name={observerName} size={44} color="#2563eb" />
+        </TouchableOpacity>
       </View>
+
+      {/* Account Menu Modal */}
+      <Modal
+        visible={menuVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setMenuVisible(false)}
+      >
+        <Pressable
+          style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-start', alignItems: 'flex-end', padding: 16 }}
+          onPress={() => setMenuVisible(false)}
+        >
+          <View
+            style={{
+              marginTop: 60,
+              width: 220,
+              backgroundColor: '#fff',
+              borderRadius: 14,
+              paddingVertical: 8,
+              shadowColor: '#000',
+              shadowOffset: { width: 0, height: 4 },
+              shadowOpacity: 0.2,
+              shadowRadius: 12,
+              elevation: 8,
+            }}
+          >
+            <View style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 14, paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: '#f1f5f9' }}>
+              <Avatar name={observerName} size={36} color="#2563eb" />
+              <View style={{ marginLeft: 10, flex: 1 }}>
+                <Text style={{ fontSize: 13, fontWeight: '700', color: '#0f172a' }} numberOfLines={1}>
+                  {observerName}
+                </Text>
+                <Text style={{ fontSize: 11, color: '#64748b' }} numberOfLines={1}>
+                  {observerDesignation}
+                </Text>
+              </View>
+            </View>
+
+            <TouchableOpacity
+              style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 14, paddingVertical: 12 }}
+              onPress={() => {
+                setMenuVisible(false);
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                router.push('/profile' as any);
+              }}
+              activeOpacity={0.7}
+            >
+              <Text style={{ fontSize: 16, marginRight: 10 }}>👤</Text>
+              <Text style={{ fontSize: 13, fontWeight: '600', color: '#334155' }}>Profile</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 14, paddingVertical: 12 }}
+              onPress={handleLogout}
+              disabled={loggingOut}
+              activeOpacity={0.7}
+            >
+              <Text style={{ fontSize: 16, marginRight: 10 }}>🚪</Text>
+              <Text style={{ fontSize: 13, fontWeight: '600', color: '#ef4444' }}>
+                {loggingOut ? 'Logging out...' : 'Logout'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </Pressable>
+      </Modal>
 
       {/* Period Tabs */}
       <View style={{ flexDirection: 'row', backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 10, padding: 3, marginBottom: 12 }}>
