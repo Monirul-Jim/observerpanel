@@ -4,7 +4,7 @@ import { rateColor } from '@/utils/formatters';
 export function CollectionBar({ rate }: { rate: number }) {
   const color = rateColor(rate);
   return (
-    <View className="mt-1.5 w-full">
+    <View className="mt-3 w-full">
       <View className="mb-1 flex-row justify-between">
         <Text className="text-[11px] text-slate-500 dark:text-slate-400">Collection Rate</Text>
         <Text style={{ fontSize: 11, fontWeight: '700', color }}>{rate}%</Text>

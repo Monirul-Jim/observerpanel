@@ -16,37 +16,37 @@ export function InstituteCard({ inst, periodIdx, onPress }: InstituteCardProps) 
 
   return (
     <View
-      className="mb-2.5 rounded-2xl"
-      style={{ shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 8, elevation: 2 }}
+      className="mb-3 rounded-2xl"
+      style={{ shadowColor: '#000', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.06, shadowRadius: 10, elevation: 2 }}
     >
-      <View className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-3.5 pl-[18px] dark:border-slate-700 dark:bg-slate-800">
+      <View className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-4 pl-[19px] dark:border-slate-700 dark:bg-slate-800">
         {/* Left accent bar */}
         <View
-          className="absolute bottom-0 left-0 top-0 w-1 rounded-l-2xl"
+          className="absolute bottom-0 left-0 top-0 w-[3px]"
           style={{ backgroundColor: accentColor }}
         />
 
         {/* Header row */}
         <View className="flex-row items-start justify-between">
-          <View className="min-w-0 flex-1">
-            <View className="mb-1 flex-row items-center">
+          <View className="min-w-0 flex-1 pr-3">
+            <View className="mb-1.5 flex-row items-center">
               <StatusDot active={inst.status === 'active'} />
-              <Text selectable={true} className="text-[10px] text-slate-500 dark:text-slate-400">{inst.code}</Text>
-              <View className="ml-1.5 rounded bg-slate-100 px-1.5 py-0.5 dark:bg-slate-700">
-                <Text selectable={true} className="text-[9px] text-slate-600 dark:text-slate-300">{inst.type}</Text>
+              <Text selectable className="text-[10px] font-medium text-slate-400 dark:text-slate-500">{inst.code}</Text>
+              <View className="ml-1.5 rounded-full bg-slate-100 px-2 py-0.5 dark:bg-slate-700">
+                <Text selectable className="text-[9px] font-semibold text-slate-500 dark:text-slate-300">{inst.type}</Text>
               </View>
             </View>
-            <Text selectable={true} className="pr-2 text-sm font-bold leading-5 text-slate-900 dark:text-white">{inst.name}</Text>
-            <Text selectable={true} className="mt-0.5 text-[11px] text-slate-400 dark:text-slate-500">
+            <Text selectable className="text-[15px] font-bold leading-5 text-slate-900 dark:text-white">{inst.name}</Text>
+            <Text selectable className="mt-1 text-[11px] text-slate-400 dark:text-slate-500">
               {inst.totalStudents} Students · {inst.upazila}, {inst.district}
             </Text>
           </View>
           <View className="shrink-0 items-end">
-            <Text selectable={true} className="text-[10px] text-slate-500 dark:text-slate-400">{PERIOD_LABELS[periodIdx]}</Text>
+            <Text selectable className="text-[10px] font-medium text-slate-400 dark:text-slate-500">{PERIOD_LABELS[periodIdx]}</Text>
             <Text
-              className="mt-0.5 text-base font-extrabold"
+              className="mt-1 text-base font-extrabold"
               style={{ color: periodFee > 0 ? '#16a34a' : '#94a3b8' }}
-              selectable={true}
+              selectable
             >
               {periodFee > 0 ? fmt(periodFee) : 'Nil'}
             </Text>
@@ -54,33 +54,51 @@ export function InstituteCard({ inst, periodIdx, onPress }: InstituteCardProps) 
         </View>
 
         {/* Stats row */}
-        <View className="mt-2.5 flex-row border-y border-slate-100 py-2 dark:border-slate-700">
+        <View className="mt-3 flex-row rounded-xl bg-slate-50 py-2.5 dark:bg-slate-900/60">
           {[
-            { label: 'Total Payable', value: fmt(inst.totalPayable), red: false },
-            { label: 'Total Collected', value: fmt(inst.totalCollected), red: false },
+            { label: 'Payable', value: fmt(inst.totalPayable), red: false },
+            { label: 'Collected', value: fmt(inst.totalCollected), red: false },
             { label: 'Due', value: fmt(inst.dueAmount), red: true },
-          ].map((s, i) => (
-            <View key={i} className="flex-1 items-center">
-              <Text selectable={true} className={`text-xs font-bold ${s.red ? 'text-red-500' : 'text-slate-700 dark:text-slate-200'}`}>
+          ]?.map((s, i) => (
+            <View key={i} className="flex-1 items-center border-slate-200 dark:border-slate-700" style={i > 0 ? { borderLeftWidth: 1 } : undefined}>
+              <Text selectable className={`text-[13px] font-bold ${s.red ? 'text-red-500' : 'text-slate-700 dark:text-slate-200'}`}>
                 {s.value}
               </Text>
-              <Text selectable={true} className="mt-0.5 text-[10px] text-slate-400 dark:text-slate-500">{s.label}</Text>
+              <Text selectable className="mt-0.5 text-[10px] text-slate-400 dark:text-slate-500">{s.label}</Text>
             </View>
           ))}
         </View>
 
+        {/* Payment source breakdown (collected only) */}
+        {inst.paymentSources && (
+          <View className="mt-2 flex-row rounded-xl border border-slate-100 py-2.5 dark:border-slate-700">
+            {[
+              { label: 'Fees Mgmt.', value: fmt(inst.paymentSources.feesManagement.collected) },
+              { label: 'Online Adm.', value: fmt(inst.paymentSources.onlineAdmission.collected) },
+              { label: 'Open Payment', value: fmt(inst.paymentSources.openPayment.collected) },
+            ].map((s, i) => (
+              <View key={i} className="flex-1 items-center border-slate-100 dark:border-slate-700" style={i > 0 ? { borderLeftWidth: 1 } : undefined}>
+                <Text selectable className="text-[12px] font-bold text-slate-600 dark:text-slate-300">
+                  {s.value}
+                </Text>
+                <Text selectable className="mt-0.5 text-[9px] text-slate-400 dark:text-slate-500">{s.label}</Text>
+              </View>
+            ))}
+          </View>
+        )}
+
         <CollectionBar rate={inst.collectionRate} />
 
         {/* Footer */}
-        <View className="mt-2 flex-row items-center justify-between">
-          <Text selectable={true} className="text-[10px] text-slate-400 dark:text-slate-500">
+        <View className="mt-3 flex-row items-center justify-between border-t border-slate-100 pt-2.5 dark:border-slate-700">
+          <Text selectable className="text-[10px] text-slate-400 dark:text-slate-500">
             Last txn:{' '}
-            <Text selectable={true} className="font-semibold text-slate-500 dark:text-slate-400">
+            <Text selectable className="font-semibold text-slate-500 dark:text-slate-400">
               {inst.lastTransaction} · {inst.lastTransactionTime}
             </Text>
           </Text>
           <Pressable onPress={() => onPress(inst)} hitSlop={8}>
-            <Text className="text-[11px] font-semibold text-blue-500">Details →</Text>
+            <Text className="text-[11px] font-bold text-blue-500">Details →</Text>
           </Pressable>
         </View>
       </View>

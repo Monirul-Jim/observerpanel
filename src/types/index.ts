@@ -20,6 +20,17 @@ export interface FeeData {
   year: number;
 }
 
+export interface PaymentSourceBreakdown {
+  payable: number;
+  collected: number;
+}
+
+export interface PaymentSources {
+  feesManagement: PaymentSourceBreakdown;
+  onlineAdmission: PaymentSourceBreakdown;
+  openPayment: PaymentSourceBreakdown;
+}
+
 export interface Institute {
   id: number;
   name: string;
@@ -39,8 +50,9 @@ export interface Institute {
   totalCollected: number;
   dueAmount: number;
   collectionRate: number;
-  lastTransaction: string;
-  lastTransactionTime: string;
+  paymentSources?: PaymentSources;
+  lastTransaction: string | null;
+  lastTransactionTime: string | null;
   status: 'active' | 'inactive';
   [key: string]: unknown;
 }

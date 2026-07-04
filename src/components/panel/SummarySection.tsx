@@ -15,8 +15,8 @@ interface SummarySectionProps {
   setPeriodIdx: (idx: number) => void;
 }
 
-const STAT_ICONS = ['📅', '🏫', '✅', '⚠️'] as const;
-const STAT_ACCENTS = ['#4ade80', '#ffffff', '#7dd3fc', '#fca5a5'] as const;
+const STAT_ACCENTS = ['#ffffff', '#7dd3fc', '#fca5a5', '#fcd34d', '#c4b5fd', '#86efac'] as const;
+const STAT_ICONS = ['💰', '✅', '⚠️', '🧾', '📝', '💳'] as const;
 
 export function SummarySection({ institutes, periodIdx, setPeriodIdx }: SummarySectionProps) {
   const router = useRouter();
@@ -40,8 +40,11 @@ export function SummarySection({ institutes, periodIdx, setPeriodIdx }: SummaryS
       payable: acc.payable + inst.totalPayable,
       collected: acc.collected + inst.totalCollected,
       due: acc.due + inst.dueAmount,
+      feesManagement: acc.feesManagement + (inst.paymentSources?.feesManagement.collected ?? 0),
+      onlineAdmission: acc.onlineAdmission + (inst.paymentSources?.onlineAdmission.collected ?? 0),
+      openPayment: acc.openPayment + (inst.paymentSources?.openPayment.collected ?? 0),
     }),
-    { periodFee: 0, payable: 0, collected: 0, due: 0 },
+    { periodFee: 0, payable: 0, collected: 0, due: 0, feesManagement: 0, onlineAdmission: 0, openPayment: 0 },
   );
 
   const achievedPct = totals.payable > 0
@@ -49,29 +52,36 @@ export function SummarySection({ institutes, periodIdx, setPeriodIdx }: SummaryS
     : 0;
 
   const stats = [
-    { label: `${PERIOD_LABELS[periodIdx]} Collection`, value: fmt(totals.periodFee), sub: undefined },
     { label: 'Total Payable', value: fmt(totals.payable), sub: undefined },
     { label: 'Total Collected', value: fmt(totals.collected), sub: `${achievedPct}% achieved` },
     { label: 'Total Due', value: fmt(totals.due), sub: 'Pending' },
+    { label: 'Fees Management', value: fmt(totals.feesManagement), sub: 'Collected' },
+    { label: 'Online Admission', value: fmt(totals.onlineAdmission), sub: 'Collected' },
+    { label: 'Open Payment', value: fmt(totals.openPayment), sub: 'Collected' },
   ];
 
   return (
-    <View style={{ backgroundColor: '#1e3a5f', paddingHorizontal: 16, paddingTop: 14 }}>
+    <View className="px-4 pt-4">
       {/* Observer Info */}
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-        <View style={{ flex: 1 }}>
-          <Text style={{ fontSize: 10, color: 'rgba(255,255,255,0.5)', marginBottom: 2, letterSpacing: 0.8, textTransform: 'uppercase' }}>
+      <View className="mb-4 flex-row items-center justify-between">
+        <View className="flex-1 pr-3">
+          <Text className="mb-0.5 text-[10px] uppercase tracking-wider text-white/45">
             Observer Panel
           </Text>
-          <Text style={{ fontSize: 15, fontWeight: '800', color: '#fff' }}>
+          <Text className="text-[15px] font-extrabold text-white" numberOfLines={1}>
             {observerName}
           </Text>
-          <Text style={{ fontSize: 11, color: 'rgba(255,255,255,0.55)', marginTop: 2 }}>
+          <Text className="mt-0.5 text-[11px] text-white/55" numberOfLines={1}>
             {observerDesignation} · {observerZone}
           </Text>
         </View>
         <TouchableOpacity onPress={() => setMenuVisible(true)} activeOpacity={0.8}>
-          <Avatar name={observerName} size={44} color="#2563eb" uri={profile?.avatar_url} />
+          <View
+            className="rounded-full"
+            style={{ shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.25, shadowRadius: 6, elevation: 4 }}
+          >
+            <Avatar name={observerName} size={46} color="#2563eb" uri={profile?.avatar_url} />
+          </View>
         </TouchableOpacity>
       </View>
 
@@ -152,26 +162,21 @@ export function SummarySection({ institutes, periodIdx, setPeriodIdx }: SummaryS
       </Modal>
 
       {/* Period Tabs */}
-      <View style={{ flexDirection: 'row', backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 10, padding: 3, marginBottom: 12 }}>
+      <View className="mb-3 flex-row rounded-[10px] bg-white/10 p-1">
         {PERIOD_LABELS.map((lbl, i) => (
           <TouchableOpacity
             key={i}
             onPress={() => setPeriodIdx(i)}
             activeOpacity={0.8}
-            style={{
-              flex: 1,
-              paddingVertical: 7,
-              borderRadius: 8,
-              alignItems: 'center',
-              backgroundColor: periodIdx === i ? '#fff' : 'transparent',
-            }}
+            className={`flex-1 items-center rounded-lg py-2 ${periodIdx === i ? 'bg-white' : ''}`}
+            style={
+              periodIdx === i
+                ? { shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.15, shadowRadius: 3, elevation: 2 }
+                : undefined
+            }
           >
             <Text
-              style={{
-                fontSize: 11,
-                fontWeight: periodIdx === i ? '700' : '500',
-                color: periodIdx === i ? '#1e3a5f' : 'rgba(255,255,255,0.65)',
-              }}
+              className={`text-[11px] ${periodIdx === i ? 'font-bold text-[#1e3a5f]' : 'font-medium text-white/65'}`}
             >
               {lbl}
             </Text>
@@ -179,15 +184,35 @@ export function SummarySection({ institutes, periodIdx, setPeriodIdx }: SummaryS
         ))}
       </View>
 
-      {/* Stats Grid – 2 columns × 2 rows */}
-      <View style={{ flexDirection: 'row', gap: 8, marginBottom: 8 }}>
+      {/* Today/period collection – standalone highlight box */}
+      <View className="mb-2 rounded-xl border border-white/10 bg-white/[0.07] p-3">
+        <View className="flex-row items-center justify-between">
+          <View className="flex-row items-center">
+            <View className="mr-2.5 h-8 w-8 items-center justify-center rounded-full bg-white/10">
+              <Text className="text-sm">📅</Text>
+            </View>
+            <Text className="text-[11px] font-medium text-white/60">
+              {PERIOD_LABELS[periodIdx]} Collection
+            </Text>
+          </View>
+          <Text style={{ fontSize: 17, fontWeight: '800', color: '#4ade80' }}>{fmt(totals.periodFee)}</Text>
+        </View>
+      </View>
+
+      {/* Stats Grid – 2 columns × 3 rows */}
+      <View className="mb-2 flex-row gap-2">
         {stats.slice(0, 2).map((s, i) => (
           <StatCard key={i} {...s} icon={STAT_ICONS[i]} accent={STAT_ACCENTS[i]} />
         ))}
       </View>
-      <View style={{ flexDirection: 'row', gap: 8, marginBottom: 14 }}>
+      <View className="mb-2 flex-row gap-2">
         {stats.slice(2, 4).map((s, i) => (
           <StatCard key={i + 2} {...s} icon={STAT_ICONS[i + 2]} accent={STAT_ACCENTS[i + 2]} />
+        ))}
+      </View>
+      <View className="mb-4 flex-row gap-2">
+        {stats.slice(4, 6).map((s, i) => (
+          <StatCard key={i + 4} {...s} icon={STAT_ICONS[i + 4]} accent={STAT_ACCENTS[i + 4]} />
         ))}
       </View>
     </View>
@@ -204,20 +229,13 @@ interface StatCardProps {
 
 function StatCard({ icon, value, label, accent, sub }: StatCardProps) {
   return (
-    <View
-      style={{
-        flex: 1,
-        backgroundColor: 'rgba(255,255,255,0.09)',
-        borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.12)',
-        borderRadius: 12,
-        padding: 10,
-      }}
-    >
-      <Text style={{ fontSize: 16, marginBottom: 4 }}>{icon}</Text>
+    <View className="flex-1 rounded-xl border border-white/10 bg-white/[0.07] p-2.5">
+      <View className="mb-1.5 h-6 w-6 items-center justify-center rounded-full bg-white/10">
+        <Text className="text-xs">{icon}</Text>
+      </View>
       <Text style={{ fontSize: 15, fontWeight: '800', color: accent }}>{value}</Text>
-      <Text style={{ fontSize: 10, color: 'rgba(255,255,255,0.5)', marginTop: 2 }}>{label}</Text>
-      {sub && <Text style={{ fontSize: 9, color: 'rgba(255,255,255,0.35)', marginTop: 1 }}>{sub}</Text>}
+      <Text className="mt-0.5 text-[10px] text-white/50">{label}</Text>
+      {sub && <Text className="mt-px text-[9px] text-white/35">{sub}</Text>}
     </View>
   );
 }

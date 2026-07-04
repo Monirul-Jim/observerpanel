@@ -35,43 +35,43 @@ export function DetailView({ inst, onBack }: DetailViewProps) {
         </View>
       </View>
 
-      {/* Hero */}
-      <DetailHero inst={inst} />
-
-      {/* Tab bar */}
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        className="shrink-0 grow-0 border-b border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-800"
-        contentContainerClassName="px-1"
-      >
-        {TABS.map((tab) => (
-          <TouchableOpacity
-            key={tab.id}
-            onPress={() => setActiveTab(tab.id)}
-            className={`border-b-2 px-3.5 py-2.5 ${activeTab === tab.id ? 'border-[#1e3a5f]' : 'border-transparent'}`}
-            activeOpacity={0.7}
-          >
-            <Text
-              className={`text-xs ${activeTab === tab.id ? 'font-bold text-[#1e3a5f] dark:text-white' : 'font-medium text-slate-500 dark:text-slate-400'}`}
-            >
-              {tab.label}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
-
-      {/* Tab content */}
+      {/* Everything below scrolls together as one screen */}
       <ScrollView
         className="flex-1 bg-slate-50 dark:bg-slate-900"
-        contentContainerClassName="p-4"
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
-        {activeTab === 'overview' && <OverviewTab inst={inst} />}
-        {activeTab === 'summary' && <SummaryTab inst={inst} />}
-        {activeTab === 'date2date' && <DateToDateTab />}
-        <View className="h-6" />
+        <DetailHero inst={inst} />
+
+        {/* Tab bar */}
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          className="shrink-0 grow-0 border-b border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-800"
+          contentContainerClassName="px-1"
+        >
+          {TABS.map((tab) => (
+            <TouchableOpacity
+              key={tab.id}
+              onPress={() => setActiveTab(tab.id)}
+              className={`border-b-2 px-3.5 py-2.5 ${activeTab === tab.id ? 'border-[#1e3a5f]' : 'border-transparent'}`}
+              activeOpacity={0.7}
+            >
+              <Text
+                className={`text-xs ${activeTab === tab.id ? 'font-bold text-[#1e3a5f] dark:text-white' : 'font-medium text-slate-500 dark:text-slate-400'}`}
+              >
+                {tab.label}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+
+        {/* Tab content */}
+        <View className="p-4">
+          {activeTab === 'overview' && <OverviewTab inst={inst} />}
+          {activeTab === 'summary' && <SummaryTab inst={inst} />}
+          {activeTab === 'date2date' && <DateToDateTab />}
+        </View>
       </ScrollView>
     </View>
   );
