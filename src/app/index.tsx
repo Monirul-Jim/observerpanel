@@ -43,7 +43,7 @@ export default function LoginScreen() {
     handleSubmit,
     formState: { errors },
   } = useForm<LoginFormData>({
-    defaultValues: { email: "test@example.com", password: "123456" },
+    defaultValues: { email: "rahimhossain33455@gmail.com", password: "123456" },
   });
 
   const onSubmit = async (data: LoginFormData) => {
@@ -168,10 +168,12 @@ export default function LoginScreen() {
           </View>
 
           {/* Password */}
-          <View className="mb-4">
-            <Text className="mb-1.5 text-[13px] font-semibold text-gray-700">
-              Password
-            </Text>
+          <View className="mb-2">
+            <View className="mb-1.5 flex-row items-center justify-between">
+              <Text className="text-[13px] font-semibold text-gray-700">
+                Password
+              </Text>
+            </View>
             <Controller
               control={control}
               name="password"
@@ -210,6 +212,14 @@ export default function LoginScreen() {
                 </View>
               )}
             />
+            <TouchableOpacity
+              onPress={() => router.push("/forget" as any)}
+              hitSlop={8}
+            >
+              <Text className="text-[12px] mt-2 font-semibold text-blue-500">
+                Forgot Password?
+              </Text>
+            </TouchableOpacity>
             {errors.password && (
               <Text className="ml-1 mt-1 text-[11px] text-red-500">
                 {errors.password.message}

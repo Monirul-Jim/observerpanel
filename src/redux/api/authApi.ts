@@ -1,4 +1,5 @@
 import type { Institute } from "@/types";
+import type { TAuthUser } from "../feature/authSlice";
 import { baseApi } from "./baseApi";
 
 type TInstitutesResponse = {
@@ -42,6 +43,27 @@ const authApi = baseApi.injectEndpoints({
       providesTags: ["Institute"],
       keepUnusedDataFor: 300,
     }),
+    updateProfile: builder.mutation<
+      { payload: { data: { user: TAuthUser } } },
+      { id: number; formData: FormData }
+    >({
+      query: ({ id, formData }) => ({
+        url: `/observer/update-profile/${id}`,
+        method: "POST",
+        body: formData,
+      }),
+    }),
+    forgotPassword: builder.mutation<unknown, { email: string }>({
+      query: ({ email }) => {
+        const formData = new FormData();
+        formData.append("email", email);
+        return {
+          url: "/observer/forgot-password",
+          method: "POST",
+          body: formData,
+        };
+      },
+    }),
   }),
 });
 
@@ -49,4 +71,6 @@ export const {
   useLoginUserMutation,
   useLogOutUserMutation,
   useGetInstituteInfoQuery,
+  useUpdateProfileMutation,
+  useForgotPasswordMutation,
 } = authApi;

@@ -60,6 +60,8 @@ Authorization: Bearer <token>
 
 ### 2. Institute List (School এর তালিকা)
 
+> **গুরুত্বপূর্ণ:** Institute এর সব online payment report — **Fees Management**, **Online Admission**, এবং **Open Payment** — এই তিনটি source থেকেই collection data Observer Portal এ দেখাতে হবে। অর্থাৎ `fee`, `totalPayable`, `totalCollected`, `dueAmount`, `collectionRate` ইত্যাদি field গুলো শুধু Fees Management এর data না, বরং তিনটি payment source মিলিয়ে aggregate করা থাকবে।
+
 **GET** `/institutes`
 
 **Query Parameters (সবগুলো optional):**
@@ -96,12 +98,17 @@ Authorization: Bearer <token>
         "today": 85000,
         "week": 420000,
         "month": 1700000,
-        "year": 14500000
+        "year": 14500000,
       },
       "totalPayable": 18500000,
       "totalCollected": 14500000,
       "dueAmount": 4000000,
       "collectionRate": 78,
+      "paymentSources": {
+        "feesManagement": { "payable": 15000000, "collected": 12000000 },
+        "onlineAdmission": { "payable": 2000000, "collected": 1800000 },
+        "openPayment": { "payable": 1500000, "collected": 700000 }
+      },
       "lastTransaction": "2026-05-21",
       "lastTransactionTime": "11:42 AM",
       "status": "active"
@@ -109,6 +116,13 @@ Authorization: Bearer <token>
   ]
 }
 ```
+
+> **`paymentSources`** — উপরের `totalPayable`/`totalCollected` তিনটি source এর যোগফল। প্রতিটি source এর নিজস্ব `payable` ও `collected` থাকবে:
+> - `feesManagement` → Fees Management module থেকে
+> - `onlineAdmission` → Online Admission module থেকে
+> - `openPayment` → Open Payment module থেকে
+>
+> অর্থাৎ `totalPayable = feesManagement.payable + onlineAdmission.payable + openPayment.payable` (একইভাবে `totalCollected`ও)।
 
 ---
 
@@ -142,6 +156,11 @@ Authorization: Bearer <token>
   "totalCollected": 14500000,
   "dueAmount": 4000000,
   "collectionRate": 78,
+  "paymentSources": {
+    "feesManagement": { "payable": 15000000, "collected": 12000000 },
+    "onlineAdmission": { "payable": 2000000, "collected": 1800000 },
+    "openPayment": { "payable": 1500000, "collected": 700000 }
+  },
   "lastTransaction": "2026-05-21",
   "lastTransactionTime": "11:42 AM",
   "status": "active"
@@ -208,6 +227,9 @@ Authorization: Bearer <token>
 | `totalCollected` | integer | মোট আদায় হয়েছে (BDT) |
 | `dueAmount` | integer | বকেয়া = `totalPayable - totalCollected` (BDT) |
 | `collectionRate` | integer | আদায়ের হার % — formula: `round((totalCollected / totalPayable) * 100)` |
+| `paymentSources.feesManagement` | object | `{ payable, collected }` — Fees Management module থেকে |
+| `paymentSources.onlineAdmission` | object | `{ payable, collected }` — Online Admission module থেকে |
+| `paymentSources.openPayment` | object | `{ payable, collected }` — Open Payment module থেকে |
 | `lastTransaction` | string | সর্বশেষ লেনদেনের তারিখ, format: `YYYY-MM-DD` |
 | `lastTransactionTime` | string | সর্বশেষ লেনদেনের সময়, format: `hh:mm AM/PM` |
 | `status` | string | `"active"` অথবা `"inactive"` |
@@ -260,3 +282,4 @@ Division  (বিভাগ)
 6. Login ছাড়া বাকি সব request এ Header: `Authorization: Bearer <token>`
 7. `status=due` filter এর জন্য threshold: `dueAmount > 1000000` (১০ লাখ টাকা)
 8. `lastTransactionTime` format হবে `hh:mm AM/PM` (যেমন `11:42 AM`)
+9. Institute এর payment/collection data **Fees Management**, **Online Admission**, এবং **Open Payment** — এই তিনটি online payment report থেকেই aggregate করে Observer Portal এ পাঠাতে হবে

@@ -12,12 +12,10 @@ import { logout, setUser } from "../feature/authSlice";
 const rawBaseQuery = fetchBaseQuery({
   baseUrl: process.env.EXPO_PUBLIC_API_URL,
   credentials: "include", // Enables automatic cookie handling
-  prepareHeaders: (headers) => {
-    if (!headers.get("Content-Type")) {
-      headers.set("Content-Type", "application/json");
-    }
-    return headers;
-  },
+  // NOTE: no manual Content-Type here — fetchBaseQuery already sets
+  // "application/json" automatically for plain-object bodies, and leaves
+  // FormData bodies alone so the runtime can set the multipart boundary
+  // itself (forcing "application/json" here would break file uploads).
 });
 
 /* ---------------- BASE QUERY WITH REFRESH ---------------- */

@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { RootState } from "../store";
 
-type TAuthUser = {
+export type TAuthUser = {
   id: number;
   name: string;
   organization: string;
@@ -12,6 +12,7 @@ type TAuthUser = {
   division: string;
   mobile: string;
   email: string;
+  avatar?: string | null;
   is_active: boolean;
   created_at: string;
   updated_at: string;
