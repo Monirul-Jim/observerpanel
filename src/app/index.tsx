@@ -51,7 +51,7 @@ export default function LoginScreen() {
       const res = await loginUser(data).unwrap();
       const user = res?.payload?.data?.user;
 
-      dispatch(setUser({ user }));
+      dispatch(setUser({ user: { id: user.id } }));
       showMessage(
         "success",
         "Login Successful",

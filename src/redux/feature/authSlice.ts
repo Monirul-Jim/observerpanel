@@ -1,25 +1,15 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { RootState } from "../store";
 
-export type TAuthUser = {
+// Only the session identifier is persisted — full profile data is always
+// fetched fresh from GET /observer/profile (see useGetProfileQuery) instead
+// of being cached in Redux/storage.
+export type TAuthSession = {
   id: number;
-  name: string;
-  organization: string;
-  designation: string;
-  address: string;
-  upazila: string;
-  district: string;
-  division: string;
-  mobile: string;
-  email: string;
-  avatar?: string | null;
-  is_active: boolean;
-  created_at: string;
-  updated_at: string;
 };
 
 type TAuthState = {
-  user: null | TAuthUser;
+  user: null | TAuthSession;
 };
 
 const initialState: TAuthState = {

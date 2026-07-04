@@ -43,7 +43,7 @@ const baseQueryWithRefresh: BaseQueryFn<
         if (__DEV__) console.log("[Auth] Token refreshed successfully.");
         api.dispatch(
           setUser({
-            user: apiPayload.user,
+            user: { id: apiPayload.user.id },
           }),
         );
         result = await rawBaseQuery(args, api, extraOptions);

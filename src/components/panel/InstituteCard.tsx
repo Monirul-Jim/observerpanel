@@ -31,21 +31,22 @@ export function InstituteCard({ inst, periodIdx, onPress }: InstituteCardProps) 
           <View className="min-w-0 flex-1">
             <View className="mb-1 flex-row items-center">
               <StatusDot active={inst.status === 'active'} />
-              <Text className="text-[10px] text-slate-500 dark:text-slate-400">{inst.code}</Text>
+              <Text selectable={true} className="text-[10px] text-slate-500 dark:text-slate-400">{inst.code}</Text>
               <View className="ml-1.5 rounded bg-slate-100 px-1.5 py-0.5 dark:bg-slate-700">
-                <Text className="text-[9px] text-slate-600 dark:text-slate-300">{inst.type}</Text>
+                <Text selectable={true} className="text-[9px] text-slate-600 dark:text-slate-300">{inst.type}</Text>
               </View>
             </View>
-            <Text className="pr-2 text-sm font-bold leading-5 text-slate-900 dark:text-white">{inst.name}</Text>
-            <Text className="mt-0.5 text-[11px] text-slate-400 dark:text-slate-500">
+            <Text selectable={true} className="pr-2 text-sm font-bold leading-5 text-slate-900 dark:text-white">{inst.name}</Text>
+            <Text selectable={true} className="mt-0.5 text-[11px] text-slate-400 dark:text-slate-500">
               {inst.totalStudents} Students · {inst.upazila}, {inst.district}
             </Text>
           </View>
           <View className="shrink-0 items-end">
-            <Text className="text-[10px] text-slate-500 dark:text-slate-400">{PERIOD_LABELS[periodIdx]}</Text>
+            <Text selectable={true} className="text-[10px] text-slate-500 dark:text-slate-400">{PERIOD_LABELS[periodIdx]}</Text>
             <Text
               className="mt-0.5 text-base font-extrabold"
               style={{ color: periodFee > 0 ? '#16a34a' : '#94a3b8' }}
+              selectable={true}
             >
               {periodFee > 0 ? fmt(periodFee) : 'Nil'}
             </Text>
@@ -60,10 +61,10 @@ export function InstituteCard({ inst, periodIdx, onPress }: InstituteCardProps) 
             { label: 'Due', value: fmt(inst.dueAmount), red: true },
           ].map((s, i) => (
             <View key={i} className="flex-1 items-center">
-              <Text className={`text-xs font-bold ${s.red ? 'text-red-500' : 'text-slate-700 dark:text-slate-200'}`}>
+              <Text selectable={true} className={`text-xs font-bold ${s.red ? 'text-red-500' : 'text-slate-700 dark:text-slate-200'}`}>
                 {s.value}
               </Text>
-              <Text className="mt-0.5 text-[10px] text-slate-400 dark:text-slate-500">{s.label}</Text>
+              <Text selectable={true} className="mt-0.5 text-[10px] text-slate-400 dark:text-slate-500">{s.label}</Text>
             </View>
           ))}
         </View>
@@ -72,9 +73,9 @@ export function InstituteCard({ inst, periodIdx, onPress }: InstituteCardProps) 
 
         {/* Footer */}
         <View className="mt-2 flex-row items-center justify-between">
-          <Text className="text-[10px] text-slate-400 dark:text-slate-500">
+          <Text selectable={true} className="text-[10px] text-slate-400 dark:text-slate-500">
             Last txn:{' '}
-            <Text className="font-semibold text-slate-500 dark:text-slate-400">
+            <Text selectable={true} className="font-semibold text-slate-500 dark:text-slate-400">
               {inst.lastTransaction} · {inst.lastTransactionTime}
             </Text>
           </Text>

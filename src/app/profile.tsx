@@ -11,16 +11,33 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
+import * as FileSystem from 'expo-file-system/legacy';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { useLogout } from '@/redux/feature/useLogout';
 import { useDarkMode } from '@/redux/feature/useDarkMode';
-import { setUser } from '@/redux/feature/authSlice';
-import { useUpdateProfileMutation } from '@/redux/api/authApi';
+import { useGetProfileQuery, useUpdateProfileMutation } from '@/redux/api/authApi';
 import { showMessage } from '@/components/Toast/message';
 import { Avatar } from '@/components/panel/Avatar';
 
 type FieldKey = 'organization' | 'designation' | 'mobile' | 'email' | 'address' | 'upazila' | 'district' | 'division';
+
+// Decode base64 to raw bytes without relying on `atob` (not guaranteed to
+// exist in the Hermes global scope).
+function base64ToBytes(base64: string): Uint8Array {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
+  const clean = base64.replace(/[^A-Za-z0-9+/]/g, '');
+  const bytes: number[] = [];
+  for (let i = 0; i < clean.length; i += 4) {
+    const e1 = chars.indexOf(clean[i]);
+    const e2 = chars.indexOf(clean[i + 1]);
+    const e3 = chars.indexOf(clean[i + 2]);
+    const e4 = chars.indexOf(clean[i + 3]);
+    bytes.push((e1 << 2) | (e2 >> 4));
+    if (e3 !== -1 && clean[i + 2] !== undefined) bytes.push(((e2 & 15) << 4) | (e3 >> 2));
+    if (e4 !== -1 && clean[i + 3] !== undefined) bytes.push(((e3 & 3) << 6) | e4);
+  }
+  return new Uint8Array(bytes);
+}
 
 const FIELDS: { label: string; key: FieldKey; keyboardType?: 'email-address' | 'phone-pad' }[] = [
   { label: 'Organization', key: 'organization' },
@@ -35,12 +52,11 @@ const FIELDS: { label: string; key: FieldKey; keyboardType?: 'email-address' | '
 
 export default function ProfileScreen() {
   const router = useRouter();
-  const dispatch = useAppDispatch();
   const insets = useSafeAreaInsets();
-  const user = useAppSelector((state) => state.auth.user);
+  const { data: user, isLoading: loadingProfile } = useGetProfileQuery();
   const { isDark, toggleDarkMode } = useDarkMode();
   const { handleLogout, loggingOut } = useLogout();
-  const [updateProfile, { isLoading: saving ,error}] = useUpdateProfileMutation();
+  const [updateProfile, { isLoading: saving }] = useUpdateProfileMutation();
   const headerTopPad = Platform.OS === 'web' ? 0 : insets.top;
 
   const [editMode, setEditMode] = useState(false);
@@ -54,8 +70,7 @@ export default function ProfileScreen() {
     district: '',
     division: '',
   });
-  console.log(error);
-  
+
   const [name, setName] = useState('');
   const [avatarUri, setAvatarUri] = useState<string | null>(null);
 
@@ -103,36 +118,50 @@ export default function ProfileScreen() {
       const mimeType = `image/${ext === 'jpg' ? 'jpeg' : ext}`;
 
       if (Platform.OS === 'web') {
-        // Web's FormData needs a real Blob/File — the {uri,name,type} object
-        // trick only works with React Native's native FormData polyfill.
+        // Browsers' native FormData/fetch handle Blob-from-local-uri fine.
         const blob = await (await fetch(avatarUri)).blob();
         formData.append('avatar', blob, fileName);
       } else {
+        // On native, Expo's global fetch ("winter" runtime) needs either a
+        // real Blob or a `.bytes()`-shaped object — and React Native's own
+        // Blob implementation can't be built from a raw ArrayBuffer, so
+        // `fetch(uri).blob()` fails here. Read the file as base64 instead
+        // and hand back a duck-typed object with `.bytes()`.
+        const base64 = await FileSystem.readAsStringAsync(avatarUri, {
+          encoding: FileSystem.EncodingType.Base64,
+        });
+        const bytes = base64ToBytes(base64);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         formData.append('avatar', {
-          uri: avatarUri,
           name: fileName,
           type: mimeType,
+          bytes: async () => bytes,
         } as any);
       }
     }
 
     try {
-      const res = await updateProfile({ id: user.id, formData }).unwrap();
-      const updatedUser = res?.payload?.data?.user;
-      dispatch(setUser({ user: updatedUser ?? { ...user, name, ...form } }));
+      await updateProfile({ id: user.id, formData }).unwrap();
       showMessage('success', 'Profile Updated', 'Your profile has been updated successfully.');
       setEditMode(false);
     } catch (err: any) {
-      console.log(err);
       const errors = err?.data?.errors;
+      console.log(errors)
       const firstError = errors && (Object.values(errors)[0] as any);
       const message = firstError?.[0]?.message || err?.data?.message || 'Failed to update profile';
       showMessage('error', 'Update Failed', String(message));
     }
   };
 
-  const displayAvatarUri = editMode ? avatarUri ?? user?.avatar : user?.avatar;
+  const displayAvatarUri = editMode ? avatarUri ?? user?.avatar_url : user?.avatar_url;
+
+  if (loadingProfile && !user) {
+    return (
+      <View className="flex-1 items-center justify-center bg-slate-50 dark:bg-slate-900">
+        <ActivityIndicator color="#1e3a5f" size="large" />
+      </View>
+    );
+  }
 
   return (
     <View className="flex-1 bg-slate-50 dark:bg-slate-900">

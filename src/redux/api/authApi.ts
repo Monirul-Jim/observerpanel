@@ -1,12 +1,38 @@
 import type { Institute } from "@/types";
-import type { TAuthUser } from "../feature/authSlice";
 import { baseApi } from "./baseApi";
+
+export type TAuthUser = {
+  id: number;
+  name: string;
+  organization: string;
+  designation: string;
+  address: string;
+  upazila: string;
+  district: string;
+  division: string;
+  mobile: string;
+  email: string;
+  avatar?: string | null;
+  avatar_url?: string | null;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+};
 
 type TInstitutesResponse = {
   payload: {
     data: {
       total: number;
       institutes: Institute[];
+    };
+  };
+};
+
+type TProfileResponse = {
+  payload: {
+    data: {
+      status: string;
+      user: TAuthUser;
     };
   };
 };
@@ -43,6 +69,11 @@ const authApi = baseApi.injectEndpoints({
       providesTags: ["Institute"],
       keepUnusedDataFor: 300,
     }),
+    getProfile: builder.query<TAuthUser, void>({
+      query: () => "/observer/profile",
+      transformResponse: (res: TProfileResponse) => res.payload.data.user,
+      providesTags: ["AuthUser"],
+    }),
     updateProfile: builder.mutation<
       { payload: { data: { user: TAuthUser } } },
       { id: number; formData: FormData }
@@ -52,6 +83,7 @@ const authApi = baseApi.injectEndpoints({
         method: "POST",
         body: formData,
       }),
+      invalidatesTags: ["AuthUser"],
     }),
     forgotPassword: builder.mutation<unknown, { email: string }>({
       query: ({ email }) => {
@@ -71,6 +103,7 @@ export const {
   useLoginUserMutation,
   useLogOutUserMutation,
   useGetInstituteInfoQuery,
+  useGetProfileQuery,
   useUpdateProfileMutation,
   useForgotPasswordMutation,
 } = authApi;

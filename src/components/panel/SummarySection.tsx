@@ -5,7 +5,7 @@ import type { Institute } from '@/types';
 import { PERIOD_KEYS, PERIOD_LABELS, fmt } from '@/utils/formatters';
 import { OBSERVER } from '@/data/mock-data';
 import { Avatar } from './Avatar';
-import { useAppSelector } from '@/redux/hooks';
+import { useGetProfileQuery } from '@/redux/api/authApi';
 import { useLogout } from '@/redux/feature/useLogout';
 import { useDarkMode } from '@/redux/feature/useDarkMode';
 
@@ -20,14 +20,14 @@ const STAT_ACCENTS = ['#4ade80', '#ffffff', '#7dd3fc', '#fca5a5'] as const;
 
 export function SummarySection({ institutes, periodIdx, setPeriodIdx }: SummarySectionProps) {
   const router = useRouter();
-  const user = useAppSelector((state) => state.auth.user);
+  const { data: profile } = useGetProfileQuery();
   const { isDark, toggleDarkMode } = useDarkMode();
   const { handleLogout: doLogout, loggingOut } = useLogout();
   const [menuVisible, setMenuVisible] = useState(false);
 
-  const observerName = user?.name ?? OBSERVER.name;
-  const observerDesignation = user?.designation ?? OBSERVER.designation;
-  const observerZone = user?.division ?? OBSERVER.zone;
+  const observerName = profile?.name ?? OBSERVER.name;
+  const observerDesignation = profile?.designation ?? OBSERVER.designation;
+  const observerZone = profile?.division ?? OBSERVER.zone;
 
   const handleLogout = async () => {
     setMenuVisible(false);
@@ -71,7 +71,7 @@ export function SummarySection({ institutes, periodIdx, setPeriodIdx }: SummaryS
           </Text>
         </View>
         <TouchableOpacity onPress={() => setMenuVisible(true)} activeOpacity={0.8}>
-          <Avatar name={observerName} size={44} color="#2563eb" />
+          <Avatar name={observerName} size={44} color="#2563eb" uri={profile?.avatar_url} />
         </TouchableOpacity>
       </View>
 
@@ -99,7 +99,7 @@ export function SummarySection({ institutes, periodIdx, setPeriodIdx }: SummaryS
             }}
           >
             <View className="flex-row items-center border-b border-slate-100 px-3.5 py-2.5 dark:border-slate-700">
-              <Avatar name={observerName} size={36} color="#2563eb" />
+              <Avatar name={observerName} size={36} color="#2563eb" uri={profile?.avatar_url} />
               <View className="ml-2.5 flex-1">
                 <Text className="text-[13px] font-bold text-slate-900 dark:text-white" numberOfLines={1}>
                   {observerName}
