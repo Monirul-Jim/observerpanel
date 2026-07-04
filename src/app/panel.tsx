@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
-import { View, Text, ScrollView, Platform } from 'react-native';
+import { View, Text, FlatList, Platform, RefreshControl } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { Institute, LayerFilter } from '@/types';
 import { HIERARCHY, OBSERVER } from '@/data/mock-data';
@@ -26,7 +26,7 @@ export default function PanelScreen() {
   }, [search]);
 
   // Filtering happens server-side — see README "Institute List" query params
-  const { data: institutes = [] } = useGetInstituteInfoQuery({
+  const { data: institutes = [], isFetching, refetch } = useGetInstituteInfoQuery({
     ...(debouncedSearch && { search: debouncedSearch }),
     ...(statusFilter !== 'all' && { status: statusFilter }),
     ...(layerFilter.value !== 'all' && {
@@ -67,55 +67,60 @@ export default function PanelScreen() {
       ) : (
         /* ── List View ─────────────────────────────── */
         <View className="w-full max-w-[430px] flex-1 overflow-hidden bg-slate-50 dark:bg-slate-900">
-          <ScrollView
+          <FlatList
             className="flex-1"
+            data={institutes}
+            keyExtractor={(inst) => String(inst.id)}
+            renderItem={({ item }) => (
+              <View className="px-4">
+                <InstituteCard inst={item} periodIdx={periodIdx} onPress={setSelectedInst} />
+              </View>
+            )}
             contentContainerStyle={{ paddingBottom: bottomPad + 20 }}
             showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps="handled"
-          >
-            {/* Dark header with top safe-area padding */}
-            <View className="bg-[#1e3a5f]" style={{ paddingTop: headerTopPad }}>
-              <SummarySection
-                institutes={institutes}
-                periodIdx={periodIdx}
-                setPeriodIdx={setPeriodIdx}
-              />
-            </View>
-
-            <FilterBar
-              search={search}
-              onSearchChange={setSearch}
-              visibleLayers={visibleLayers}
-              layerFilter={layerFilter}
-              onLayerLevelChange={handleLayerLevelChange}
-              onLayerValueChange={handleLayerValueChange}
-              layerValues={layerValues}
-              statusFilter={statusFilter}
-              onStatusFilterChange={setStatusFilter}
-            />
-
-            <View className="px-4 pt-3">
-              <Text className="mb-3 text-base font-bold text-slate-700 dark:text-slate-200">
-                {institutes.length} institution{institutes.length !== 1 ? 's' : ''} found
-              </Text>
-
-              {institutes.map((inst) => (
-                <InstituteCard
-                  key={inst.id}
-                  inst={inst}
-                  periodIdx={periodIdx}
-                  onPress={setSelectedInst}
-                />
-              ))}
-
-              {institutes.length === 0 && (
-                <View className="items-center py-12">
-                  <Text className="mb-2 text-3xl">🔍</Text>
-                  <Text className="text-sm text-slate-400">No institutions found</Text>
+            refreshControl={
+              <RefreshControl refreshing={isFetching} onRefresh={refetch} tintColor="#1e3a5f" />
+            }
+            windowSize={7}
+            maxToRenderPerBatch={8}
+            initialNumToRender={8}
+            removeClippedSubviews={Platform.OS !== 'web'}
+            ListHeaderComponent={
+              <>
+                {/* Dark header with top safe-area padding */}
+                <View className="bg-[#1e3a5f]" style={{ paddingTop: headerTopPad }}>
+                  <SummarySection
+                    institutes={institutes}
+                    periodIdx={periodIdx}
+                    setPeriodIdx={setPeriodIdx}
+                  />
                 </View>
-              )}
-            </View>
-          </ScrollView>
+
+                <FilterBar
+                  search={search}
+                  onSearchChange={setSearch}
+                  visibleLayers={visibleLayers}
+                  layerFilter={layerFilter}
+                  onLayerLevelChange={handleLayerLevelChange}
+                  onLayerValueChange={handleLayerValueChange}
+                  layerValues={layerValues}
+                  statusFilter={statusFilter}
+                  onStatusFilterChange={setStatusFilter}
+                />
+
+                <Text className="mb-3 px-4 pt-3 text-base font-bold text-slate-700 dark:text-slate-200">
+                  {institutes.length} institution{institutes.length !== 1 ? 's' : ''} found
+                </Text>
+              </>
+            }
+            ListEmptyComponent={
+              <View className="items-center px-4 py-12">
+                <Text className="mb-2 text-3xl">🔍</Text>
+                <Text className="text-sm text-slate-400">No institutions found</Text>
+              </View>
+            }
+          />
         </View>
       )}
     </View>
