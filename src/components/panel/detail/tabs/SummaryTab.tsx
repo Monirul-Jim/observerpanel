@@ -5,11 +5,11 @@ import { fmtFull } from '@/utils/formatters';
 export function SummaryTab({ inst }: { inst: Institute }) {
   const rows: { label: string; value: string; accent?: string }[] = [
     { label: 'Institute Name', value: inst.name },
-    { label: 'Code', value: inst.code },
+    { label: 'Code', value: String(inst.code) },
     { label: 'Type', value: inst.type },
-    { label: 'Branch', value: inst.branch },
-    { label: 'Principal Office', value: inst.principal },
-    { label: 'GM Office', value: inst.gm },
+    { label: 'Branch', value: inst.branch ?? '—' },
+    { label: 'Principal Office', value: inst.principal ?? '—' },
+    { label: 'GM Office', value: inst.gm ?? '—' },
     { label: 'Upazila', value: inst.upazila },
     { label: 'District', value: inst.district },
     { label: 'Division', value: inst.division },

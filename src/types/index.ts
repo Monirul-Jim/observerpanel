@@ -23,11 +23,11 @@ export interface FeeData {
 export interface Institute {
   id: number;
   name: string;
-  code: string;
+  code: string | number;
   type: string;
-  branch: string;
-  principal: string;
-  gm: string;
+  branch: string | null;
+  principal: string | null;
+  gm: string | null;
   upazila: string;
   district: string;
   division: string;

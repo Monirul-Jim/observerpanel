@@ -1,4 +1,15 @@
+import type { Institute } from "@/types";
 import { baseApi } from "./baseApi";
+
+type TInstitutesResponse = {
+  payload: {
+    data: {
+      total: number;
+      institutes: Institute[];
+    };
+  };
+};
+
 const authApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     loginUser: builder.mutation({
@@ -14,8 +25,10 @@ const authApi = baseApi.injectEndpoints({
         method: "POST",
       }),
     }),
-    getInstituteInfo: builder.query({
+    getInstituteInfo: builder.query<Institute[], void>({
       query: () => "/observer/institutes",
+      transformResponse: (res: TInstitutesResponse) =>
+        res.payload.data.institutes,
       providesTags: ["Institute"],
       keepUnusedDataFor: 300,
     }),

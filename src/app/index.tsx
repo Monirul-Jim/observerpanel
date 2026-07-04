@@ -1,8 +1,9 @@
 import { showMessage } from "@/components/Toast/message";
 import { useLoginUserMutation } from "@/redux/api/authApi";
 import { setUser } from "@/redux/feature/authSlice";
+import { useAppSelector } from "@/redux/hooks";
 import { useRouter } from "expo-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
   ActivityIndicator,
@@ -26,8 +27,16 @@ export default function LoginScreen() {
   const router = useRouter();
   const dispatch = useDispatch();
   const insets = useSafeAreaInsets();
+  const user = useAppSelector((state) => state.auth.user);
   const [showPassword, setShowPassword] = useState(false);
   const [loginUser, { isLoading: loading }] = useLoginUserMutation();
+
+  useEffect(() => {
+    if (user) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      router.replace("/panel" as any);
+    }
+  }, [user, router]);
 
   const {
     control,
