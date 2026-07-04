@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text } from 'react-native';
 import type { Institute } from '@/types';
 import { PERIOD_KEYS, PERIOD_LABELS, fmtFull } from '@/utils/formatters';
 
@@ -8,30 +8,35 @@ const PERIOD_BGTINTS = ['#eff6ff', '#faf5ff', '#fffbeb', '#f0fdf4'] as const;
 export function OverviewTab({ inst }: { inst: Institute }) {
   return (
     <View>
-      <Text style={styles.sectionTitle}>Period Collection</Text>
+      <Text className="mb-2.5 text-xs font-bold uppercase tracking-wide text-slate-600 dark:text-slate-400">
+        Period Collection
+      </Text>
 
       {PERIOD_KEYS.map((key, i) => {
         const fee = inst.fee[key] as number;
         return (
-          <View key={key} style={styles.row}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-              <View style={[styles.iconBox, { backgroundColor: PERIOD_BGTINTS[i] }]}>
-                <Text style={{ fontSize: 16 }}>{PERIOD_ICONS[i]}</Text>
+          <View
+            key={key}
+            className="mb-2 flex-row items-center justify-between rounded-xl border border-slate-200 bg-white px-3.5 py-3.5 dark:border-slate-700 dark:bg-slate-800"
+          >
+            <View className="flex-row items-center gap-2.5">
+              <View className="h-9 w-9 items-center justify-center rounded-[10px]" style={{ backgroundColor: PERIOD_BGTINTS[i] }}>
+                <Text className="text-base">{PERIOD_ICONS[i]}</Text>
               </View>
-              <Text style={styles.rowLabel}>{PERIOD_LABELS[i]}</Text>
+              <Text className="text-[13px] font-medium text-slate-600 dark:text-slate-300">{PERIOD_LABELS[i]}</Text>
             </View>
-            <Text style={[styles.rowValue, !fee && { color: '#94a3b8' }]}>
+            <Text className={`text-base font-extrabold ${fee ? 'text-slate-900 dark:text-white' : 'text-slate-400 dark:text-slate-500'}`}>
               {fee > 0 ? fmtFull(fee) : '—'}
             </Text>
           </View>
         );
       })}
 
-      <View style={styles.lastTxnBox}>
-        <Text style={{ fontSize: 18 }}>🕐</Text>
+      <View className="mt-1 flex-row items-center gap-2.5 rounded-xl border border-green-200 bg-green-50 p-3 dark:border-green-900 dark:bg-green-950">
+        <Text className="text-lg">🕐</Text>
         <View>
-          <Text style={styles.lastTxnLabel}>Last Transaction</Text>
-          <Text style={styles.lastTxnValue}>
+          <Text className="text-[11px] font-semibold text-green-700 dark:text-green-400">Last Transaction</Text>
+          <Text className="mt-px text-[13px] font-bold text-green-800 dark:text-green-300">
             {inst.lastTransaction} · {inst.lastTransactionTime}
           </Text>
         </View>
@@ -39,65 +44,3 @@ export function OverviewTab({ inst }: { inst: Institute }) {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  sectionTitle: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: '#475569',
-    marginBottom: 10,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-  },
-  row: {
-    backgroundColor: '#fff',
-    borderWidth: 1,
-    borderColor: '#e2e8f0',
-    borderRadius: 12,
-    paddingVertical: 13,
-    paddingHorizontal: 14,
-    marginBottom: 8,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  iconBox: {
-    width: 36,
-    height: 36,
-    borderRadius: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  rowLabel: {
-    fontSize: 13,
-    color: '#475569',
-    fontWeight: '500',
-  },
-  rowValue: {
-    fontSize: 16,
-    fontWeight: '800',
-    color: '#0f172a',
-  },
-  lastTxnBox: {
-    backgroundColor: '#f0fdf4',
-    borderWidth: 1,
-    borderColor: '#bbf7d0',
-    borderRadius: 12,
-    padding: 12,
-    marginTop: 4,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-  },
-  lastTxnLabel: {
-    fontSize: 11,
-    color: '#15803d',
-    fontWeight: '600',
-  },
-  lastTxnValue: {
-    fontSize: 13,
-    color: '#166534',
-    fontWeight: '700',
-    marginTop: 1,
-  },
-});

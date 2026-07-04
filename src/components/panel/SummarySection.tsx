@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View, Text, TouchableOpacity, Modal, Pressable } from 'react-native';
+import { View, Text, TouchableOpacity, Modal, Pressable, Switch } from 'react-native';
 import { useRouter } from 'expo-router';
 import type { Institute } from '@/types';
 import { PERIOD_KEYS, PERIOD_LABELS, fmt } from '@/utils/formatters';
@@ -7,6 +7,7 @@ import { OBSERVER } from '@/data/mock-data';
 import { Avatar } from './Avatar';
 import { useAppSelector } from '@/redux/hooks';
 import { useLogout } from '@/redux/feature/useLogout';
+import { useDarkMode } from '@/redux/feature/useDarkMode';
 
 interface SummarySectionProps {
   institutes: Institute[];
@@ -20,6 +21,7 @@ const STAT_ACCENTS = ['#4ade80', '#ffffff', '#7dd3fc', '#fca5a5'] as const;
 export function SummarySection({ institutes, periodIdx, setPeriodIdx }: SummarySectionProps) {
   const router = useRouter();
   const user = useAppSelector((state) => state.auth.user);
+  const { isDark, toggleDarkMode } = useDarkMode();
   const { handleLogout: doLogout, loggingOut } = useLogout();
   const [menuVisible, setMenuVisible] = useState(false);
 
@@ -85,12 +87,10 @@ export function SummarySection({ institutes, periodIdx, setPeriodIdx }: SummaryS
           onPress={() => setMenuVisible(false)}
         >
           <View
+            className="rounded-2xl bg-white py-2 dark:bg-slate-800"
             style={{
               marginTop: 60,
               width: 220,
-              backgroundColor: '#fff',
-              borderRadius: 14,
-              paddingVertical: 8,
               shadowColor: '#000',
               shadowOffset: { width: 0, height: 4 },
               shadowOpacity: 0.2,
@@ -98,20 +98,20 @@ export function SummarySection({ institutes, periodIdx, setPeriodIdx }: SummaryS
               elevation: 8,
             }}
           >
-            <View style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 14, paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: '#f1f5f9' }}>
+            <View className="flex-row items-center border-b border-slate-100 px-3.5 py-2.5 dark:border-slate-700">
               <Avatar name={observerName} size={36} color="#2563eb" />
-              <View style={{ marginLeft: 10, flex: 1 }}>
-                <Text style={{ fontSize: 13, fontWeight: '700', color: '#0f172a' }} numberOfLines={1}>
+              <View className="ml-2.5 flex-1">
+                <Text className="text-[13px] font-bold text-slate-900 dark:text-white" numberOfLines={1}>
                   {observerName}
                 </Text>
-                <Text style={{ fontSize: 11, color: '#64748b' }} numberOfLines={1}>
+                <Text className="text-[11px] text-slate-500 dark:text-slate-400" numberOfLines={1}>
                   {observerDesignation}
                 </Text>
               </View>
             </View>
 
             <TouchableOpacity
-              style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 14, paddingVertical: 12 }}
+              className="flex-row items-center px-3.5 py-3"
               onPress={() => {
                 setMenuVisible(false);
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -119,9 +119,22 @@ export function SummarySection({ institutes, periodIdx, setPeriodIdx }: SummaryS
               }}
               activeOpacity={0.7}
             >
-              <Text style={{ fontSize: 16, marginRight: 10 }}>👤</Text>
-              <Text style={{ fontSize: 13, fontWeight: '600', color: '#334155' }}>Profile</Text>
+              <Text className="mr-2.5 text-base">👤</Text>
+              <Text className="text-[13px] font-semibold text-slate-700 dark:text-slate-200">Profile</Text>
             </TouchableOpacity>
+
+            <View className="flex-row items-center justify-between px-3.5 py-3">
+              <View className="flex-row items-center">
+                <Text className="mr-2.5 text-base">🌙</Text>
+                <Text className="text-[13px] font-semibold text-slate-700 dark:text-slate-200">Dark Mode</Text>
+              </View>
+              <Switch
+                value={isDark}
+                onValueChange={toggleDarkMode}
+                trackColor={{ false: '#e2e8f0', true: '#1e3a5f' }}
+                thumbColor="#fff"
+              />
+            </View>
 
             <TouchableOpacity
               style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 14, paddingVertical: 12 }}

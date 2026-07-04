@@ -4,12 +4,12 @@ import { rateColor } from '@/utils/formatters';
 export function CollectionBar({ rate }: { rate: number }) {
   const color = rateColor(rate);
   return (
-    <View style={{ width: '100%', marginTop: 6 }}>
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 3 }}>
-        <Text style={{ fontSize: 11, color: '#64748b' }}>Collection Rate</Text>
+    <View className="mt-1.5 w-full">
+      <View className="mb-1 flex-row justify-between">
+        <Text className="text-[11px] text-slate-500 dark:text-slate-400">Collection Rate</Text>
         <Text style={{ fontSize: 11, fontWeight: '700', color }}>{rate}%</Text>
       </View>
-      <View style={{ height: 4, backgroundColor: '#e2e8f0', borderRadius: 2, overflow: 'hidden' }}>
+      <View className="h-1 overflow-hidden rounded bg-slate-200 dark:bg-slate-700">
         <View
           style={{ height: '100%', width: `${rate}%` as `${number}%`, backgroundColor: color, borderRadius: 2 }}
         />

@@ -58,15 +58,15 @@ export default function PanelScreen() {
   const bottomPad = insets.bottom;
 
   return (
-    <View className={`flex-1 bg-slate-50 ${Platform.OS === 'web' ? 'items-center' : ''}`}>
+    <View className={`flex-1 bg-slate-50 dark:bg-slate-900 ${Platform.OS === 'web' ? 'items-center' : ''}`}>
       {selectedInst ? (
         /* ── Detail View ───────────────────────────── */
-        <View className="flex-1 bg-white" style={{ paddingTop: headerTopPad }}>
+        <View className="flex-1 bg-white dark:bg-slate-900" style={{ paddingTop: headerTopPad }}>
           <DetailView inst={selectedInst} onBack={() => setSelectedInst(null)} />
         </View>
       ) : (
         /* ── List View ─────────────────────────────── */
-        <View className="w-full max-w-[430px] flex-1 overflow-hidden bg-slate-50">
+        <View className="w-full max-w-[430px] flex-1 overflow-hidden bg-slate-50 dark:bg-slate-900">
           <ScrollView
             className="flex-1"
             contentContainerStyle={{ paddingBottom: bottomPad + 20 }}
@@ -95,7 +95,7 @@ export default function PanelScreen() {
             />
 
             <View className="px-4 pt-3">
-              <Text className="mb-3 text-base font-bold text-slate-700">
+              <Text className="mb-3 text-base font-bold text-slate-700 dark:text-slate-200">
                 {filtered.length} institution{filtered.length !== 1 ? 's' : ''} found
               </Text>
 

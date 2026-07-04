@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text } from 'react-native';
 import type { Institute } from '@/types';
 import { fmtFull } from '@/utils/formatters';
 
@@ -24,19 +24,18 @@ export function SummaryTab({ inst }: { inst: Institute }) {
   ];
 
   return (
-    <View style={styles.table}>
+    <View className="overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-700">
       {rows.map((row, i) => (
         <View
           key={i}
-          style={[
-            styles.tableRow,
-            i % 2 === 0 ? styles.rowEven : styles.rowOdd,
-            i === rows.length - 1 && { borderBottomWidth: 0 },
-          ]}
+          className={`flex-row items-center justify-between px-4 py-2.5 ${
+            i !== rows.length - 1 ? 'border-b border-slate-100 dark:border-slate-700' : ''
+          } ${i % 2 === 0 ? 'bg-white dark:bg-slate-800' : 'bg-neutral-50 dark:bg-slate-800/60'}`}
         >
-          <Text style={styles.rowLabel}>{row.label}</Text>
+          <Text className="flex-1 text-[13px] text-slate-500 dark:text-slate-400">{row.label}</Text>
           <Text
-            style={[styles.rowValue, row.accent ? { color: row.accent } : undefined]}
+            className="flex-1 text-right text-[13px] font-bold text-slate-900 dark:text-white"
+            style={row.accent ? { color: row.accent } : undefined}
             numberOfLines={2}
           >
             {row.value}
@@ -46,36 +45,3 @@ export function SummaryTab({ inst }: { inst: Institute }) {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  table: {
-    backgroundColor: '#fff',
-    borderWidth: 1,
-    borderColor: '#e2e8f0',
-    borderRadius: 14,
-    overflow: 'hidden',
-  },
-  tableRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 11,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f1f5f9',
-  },
-  rowEven: { backgroundColor: '#fff' },
-  rowOdd: { backgroundColor: '#fafafa' },
-  rowLabel: {
-    fontSize: 13,
-    color: '#64748b',
-    flex: 1,
-  },
-  rowValue: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: '#0f172a',
-    textAlign: 'right',
-    flex: 1,
-  },
-});

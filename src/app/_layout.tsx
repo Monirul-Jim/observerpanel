@@ -1,5 +1,6 @@
 import { setRichToastRef } from "@/components/Toast/message";
 import RichToast from "@/components/Toast/Toast";
+import { ThemeSync } from "@/components/ThemeSync";
 import UpdateBanner from "@/components/UpdateBanner/UpdateBanner";
 import { persistor, store } from "@/redux/store";
 import { Stack } from "expo-router";
@@ -12,6 +13,7 @@ export default function RootLayout() {
     <>
       <Provider store={store}>
         <PersistGate persistor={persistor}>
+          <ThemeSync />
           <StatusBar style="light" />
           <Stack
             screenOptions={{

@@ -1,4 +1,4 @@
-import { View, Text, TextInput, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TextInput, ScrollView, TouchableOpacity } from 'react-native';
 import type { HierarchyItem, LayerFilter } from '@/types';
 
 interface FilterBarProps {
@@ -32,12 +32,12 @@ export function FilterBar({
   onStatusFilterChange,
 }: FilterBarProps) {
   return (
-    <View style={styles.container}>
+    <View className="border-b border-slate-200 bg-white px-4 pb-1 pt-3 dark:border-slate-700 dark:bg-slate-800">
       {/* Search */}
-      <View style={styles.searchWrapper}>
-        <Text style={styles.searchIcon}>🔍</Text>
+      <View className="mb-2.5 h-[42px] flex-row items-center rounded-[10px] border border-slate-200 bg-slate-50 px-3 dark:border-slate-700 dark:bg-slate-900">
+        <Text className="mr-2 text-sm">🔍</Text>
         <TextInput
-          style={styles.searchInput}
+          className="flex-1 text-[13px] text-slate-900 dark:text-white"
           placeholder="Search institution..."
           placeholderTextColor="#94a3b8"
           value={search}
@@ -47,7 +47,7 @@ export function FilterBar({
       </View>
 
       {/* Hierarchy layer selector */}
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.chipRow} contentContainerStyle={styles.chipContent}>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} className="mb-2" contentContainerClassName="gap-1.5 pr-1">
         {visibleLayers.map((layer) => {
           const active = layerFilter.level === layer.id;
           return (
@@ -55,9 +55,9 @@ export function FilterBar({
               key={layer.id}
               onPress={() => onLayerLevelChange(layer.id)}
               activeOpacity={0.75}
-              style={[styles.darkChip, active && styles.darkChipActive]}
+              className={`rounded-full px-3 py-1.5 ${active ? 'bg-[#1e3a5f]' : 'bg-slate-100 dark:bg-slate-700'}`}
             >
-              <Text style={[styles.darkChipText, active && styles.darkChipTextActive]}>
+              <Text className={`text-[11px] ${active ? 'font-bold text-white' : 'font-medium text-slate-500 dark:text-slate-300'}`}>
                 {layer.label}
               </Text>
             </TouchableOpacity>
@@ -66,7 +66,7 @@ export function FilterBar({
       </ScrollView>
 
       {/* Layer value filter */}
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.chipRow} contentContainerStyle={styles.chipContent}>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} className="mb-2" contentContainerClassName="gap-1.5 pr-1">
         {layerValues.map((val) => {
           const active = layerFilter.value === val;
           return (
@@ -74,9 +74,13 @@ export function FilterBar({
               key={val}
               onPress={() => onLayerValueChange(val)}
               activeOpacity={0.75}
-              style={[styles.outlineChip, active && styles.outlineChipActive]}
+              className={`rounded-full border px-2.5 py-1 ${
+                active
+                  ? 'border-blue-500 bg-blue-50 dark:bg-blue-950'
+                  : 'border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900'
+              }`}
             >
-              <Text style={[styles.outlineChipText, active && styles.outlineChipTextActive]}>
+              <Text className={`text-[11px] ${active ? 'font-bold text-blue-500' : 'font-normal text-slate-500 dark:text-slate-400'}`}>
                 {val === 'all' ? 'All' : val}
               </Text>
             </TouchableOpacity>
@@ -85,7 +89,7 @@ export function FilterBar({
       </ScrollView>
 
       {/* Status filter */}
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.chipRow} contentContainerStyle={styles.chipContent}>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} className="mb-2" contentContainerClassName="gap-1.5 pr-1">
         {STATUS_FILTERS.map((f) => {
           const active = statusFilter === f.id;
           return (
@@ -93,9 +97,9 @@ export function FilterBar({
               key={f.id}
               onPress={() => onStatusFilterChange(f.id)}
               activeOpacity={0.75}
-              style={[styles.darkChip, active && styles.darkChipActive]}
+              className={`rounded-full px-3 py-1.5 ${active ? 'bg-[#1e3a5f]' : 'bg-slate-100 dark:bg-slate-700'}`}
             >
-              <Text style={[styles.darkChipText, active && styles.darkChipTextActive]}>
+              <Text className={`text-[11px] ${active ? 'font-bold text-white' : 'font-medium text-slate-500 dark:text-slate-300'}`}>
                 {f.label}
               </Text>
             </TouchableOpacity>
@@ -105,82 +109,3 @@ export function FilterBar({
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    backgroundColor: '#fff',
-    paddingHorizontal: 16,
-    paddingTop: 12,
-    paddingBottom: 4,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e2e8f0',
-  },
-  searchWrapper: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#f8fafc',
-    borderWidth: 1,
-    borderColor: '#e2e8f0',
-    borderRadius: 10,
-    paddingHorizontal: 12,
-    height: 42,
-    marginBottom: 10,
-  },
-  searchIcon: {
-    fontSize: 14,
-    marginRight: 8,
-  },
-  searchInput: {
-    flex: 1,
-    fontSize: 13,
-    color: '#0f172a',
-  },
-  chipRow: {
-    marginBottom: 8,
-  },
-  chipContent: {
-    gap: 6,
-    paddingRight: 4,
-  },
-  // Dark pill chips (hierarchy level + status)
-  darkChip: {
-    paddingHorizontal: 12,
-    paddingVertical: 5,
-    borderRadius: 20,
-    backgroundColor: '#f1f5f9',
-  },
-  darkChipActive: {
-    backgroundColor: '#1e3a5f',
-  },
-  darkChipText: {
-    fontSize: 11,
-    fontWeight: '500',
-    color: '#64748b',
-  },
-  darkChipTextActive: {
-    color: '#fff',
-    fontWeight: '700',
-  },
-  // Outline chips (layer values)
-  outlineChip: {
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: '#e2e8f0',
-    backgroundColor: '#fff',
-  },
-  outlineChipActive: {
-    borderColor: '#2563eb',
-    backgroundColor: '#eff6ff',
-  },
-  outlineChipText: {
-    fontSize: 11,
-    fontWeight: '400',
-    color: '#64748b',
-  },
-  outlineChipTextActive: {
-    color: '#2563eb',
-    fontWeight: '700',
-  },
-});

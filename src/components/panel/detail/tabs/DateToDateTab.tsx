@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View, Text, TextInput, StyleSheet } from 'react-native';
+import { View, Text, TextInput } from 'react-native';
 import { TRANSACTIONS } from '@/data/mock-data';
 import { Avatar } from '../../Avatar';
 
@@ -14,17 +14,19 @@ export function DateToDateTab() {
   return (
     <View>
       {/* Date range picker */}
-      <View style={styles.rangeCard}>
-        <Text style={styles.sectionTitle}>Select Date Range</Text>
-        <View style={{ flexDirection: 'row', gap: 10 }}>
+      <View className="mb-4 rounded-2xl border border-slate-200 bg-white p-3.5 dark:border-slate-700 dark:bg-slate-800">
+        <Text className="mb-2.5 text-xs font-bold uppercase tracking-wide text-slate-600 dark:text-slate-400">
+          Select Date Range
+        </Text>
+        <View className="flex-row gap-2.5">
           {[
             { label: 'From', val: from, set: setFrom },
             { label: 'To', val: to, set: setTo },
           ].map((f) => (
-            <View key={f.label} style={{ flex: 1 }}>
-              <Text style={styles.dateLabel}>{f.label}</Text>
+            <View key={f.label} className="flex-1">
+              <Text className="mb-1 text-[11px] font-semibold text-slate-500 dark:text-slate-400">{f.label}</Text>
               <TextInput
-                style={styles.dateInput}
+                className="rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-2 text-[13px] text-slate-900 dark:border-slate-700 dark:bg-slate-900 dark:text-white"
                 value={f.val}
                 onChangeText={f.set}
                 placeholder="YYYY-MM-DD"
@@ -34,25 +36,30 @@ export function DateToDateTab() {
             </View>
           ))}
         </View>
-        <View style={styles.totalRow}>
-          <Text style={styles.totalLabel}>Total in Range</Text>
-          <Text style={styles.totalValue}>৳{total.toLocaleString()}</Text>
+        <View className="mt-3 flex-row items-center justify-between rounded-[10px] border border-green-200 bg-green-50 px-3 py-2.5 dark:border-green-900 dark:bg-green-950">
+          <Text className="text-[13px] font-semibold text-green-700 dark:text-green-400">Total in Range</Text>
+          <Text className="text-[17px] font-extrabold text-green-600 dark:text-green-400">৳{total.toLocaleString()}</Text>
         </View>
       </View>
 
-      <Text style={styles.sectionTitle}>Student-wise Details</Text>
+      <Text className="mb-2.5 text-xs font-bold uppercase tracking-wide text-slate-600 dark:text-slate-400">
+        Student-wise Details
+      </Text>
       {filtered.map((tx) => (
-        <View key={tx.id} style={styles.txRow}>
+        <View
+          key={tx.id}
+          className="mb-2 flex-row items-center gap-2.5 rounded-xl border border-slate-200 bg-white p-3 dark:border-slate-700 dark:bg-slate-800"
+        >
           <Avatar name={tx.student} size={34} color="#4f46e5" />
-          <View style={{ flex: 1, minWidth: 0 }}>
-            <Text style={styles.studentName}>{tx.student}</Text>
-            <Text style={styles.meta}>{tx.class} · {tx.type}</Text>
-            <Text style={styles.dateText}>{tx.date} · {tx.time}</Text>
+          <View className="min-w-0 flex-1">
+            <Text className="text-[13px] font-bold text-slate-900 dark:text-white">{tx.student}</Text>
+            <Text className="mt-px text-[11px] text-slate-400 dark:text-slate-500">{tx.class} · {tx.type}</Text>
+            <Text className="mt-px text-[10px] text-slate-400 dark:text-slate-500">{tx.date} · {tx.time}</Text>
           </View>
-          <View style={{ alignItems: 'flex-end' }}>
-            <Text style={styles.amount}>৳{tx.amount.toLocaleString()}</Text>
-            <View style={styles.methodBadge}>
-              <Text style={styles.methodText}>{tx.method}</Text>
+          <View className="items-end">
+            <Text className="text-[15px] font-extrabold text-green-600 dark:text-green-400">৳{tx.amount.toLocaleString()}</Text>
+            <View className="mt-1 rounded-sm bg-slate-100 px-1.5 py-0.5 dark:bg-slate-700">
+              <Text className="text-[9px] text-slate-500 dark:text-slate-300">{tx.method}</Text>
             </View>
           </View>
         </View>
@@ -60,102 +67,3 @@ export function DateToDateTab() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  rangeCard: {
-    backgroundColor: '#fff',
-    borderWidth: 1,
-    borderColor: '#e2e8f0',
-    borderRadius: 14,
-    padding: 14,
-    marginBottom: 16,
-  },
-  sectionTitle: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: '#475569',
-    marginBottom: 10,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-  },
-  dateLabel: {
-    fontSize: 11,
-    fontWeight: '600',
-    color: '#64748b',
-    marginBottom: 4,
-  },
-  dateInput: {
-    borderWidth: 1,
-    borderColor: '#e2e8f0',
-    borderRadius: 8,
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-    fontSize: 13,
-    color: '#0f172a',
-    backgroundColor: '#f8fafc',
-  },
-  totalRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginTop: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    backgroundColor: '#f0fdf4',
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: '#bbf7d0',
-  },
-  totalLabel: {
-    fontSize: 13,
-    color: '#15803d',
-    fontWeight: '600',
-  },
-  totalValue: {
-    fontSize: 17,
-    fontWeight: '800',
-    color: '#16a34a',
-  },
-  txRow: {
-    backgroundColor: '#fff',
-    borderWidth: 1,
-    borderColor: '#e2e8f0',
-    borderRadius: 12,
-    padding: 12,
-    marginBottom: 8,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-  },
-  studentName: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: '#0f172a',
-  },
-  meta: {
-    fontSize: 11,
-    color: '#94a3b8',
-    marginTop: 1,
-  },
-  dateText: {
-    fontSize: 10,
-    color: '#94a3b8',
-    marginTop: 1,
-  },
-  amount: {
-    fontSize: 15,
-    fontWeight: '800',
-    color: '#16a34a',
-  },
-  methodBadge: {
-    marginTop: 4,
-    backgroundColor: '#f1f5f9',
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 3,
-  },
-  methodText: {
-    fontSize: 9,
-    color: '#64748b',
-  },
-});

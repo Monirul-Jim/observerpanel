@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
 import type { Institute } from '@/types';
 import { DetailHero } from './DetailHero';
 import { OverviewTab } from './tabs/OverviewTab';
@@ -23,15 +23,15 @@ export function DetailView({ inst, onBack }: DetailViewProps) {
   const [activeTab, setActiveTab] = useState<TabId>('overview');
 
   return (
-    <View style={styles.container}>
+    <View className="flex-1">
       {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={onBack} style={styles.backBtn} activeOpacity={0.75}>
-          <Text style={styles.backIcon}>←</Text>
+      <View className="flex-row items-center gap-3 border-b border-slate-200 bg-white px-4 py-3 dark:border-slate-700 dark:bg-slate-800">
+        <TouchableOpacity onPress={onBack} className="h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-slate-100 dark:bg-slate-700" activeOpacity={0.75}>
+          <Text className="text-lg leading-[22px] text-slate-700 dark:text-slate-200">←</Text>
         </TouchableOpacity>
-        <View style={{ flex: 1, minWidth: 0 }}>
-          <Text style={styles.headerTitle} numberOfLines={1}>{inst.name}</Text>
-          <Text style={styles.headerMeta}>{inst.code} · {inst.type}</Text>
+        <View className="min-w-0 flex-1">
+          <Text className="text-sm font-bold text-slate-900 dark:text-white" numberOfLines={1}>{inst.name}</Text>
+          <Text className="mt-px text-[11px] text-slate-400 dark:text-slate-500">{inst.code} · {inst.type}</Text>
         </View>
       </View>
 
@@ -42,17 +42,19 @@ export function DetailView({ inst, onBack }: DetailViewProps) {
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
-        style={styles.tabBar}
-        contentContainerStyle={styles.tabBarContent}
+        className="shrink-0 grow-0 border-b border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-800"
+        contentContainerClassName="px-1"
       >
         {TABS.map((tab) => (
           <TouchableOpacity
             key={tab.id}
             onPress={() => setActiveTab(tab.id)}
-            style={[styles.tab, activeTab === tab.id && styles.tabActive]}
+            className={`border-b-2 px-3.5 py-2.5 ${activeTab === tab.id ? 'border-[#1e3a5f]' : 'border-transparent'}`}
             activeOpacity={0.7}
           >
-            <Text style={[styles.tabText, activeTab === tab.id && styles.tabTextActive]}>
+            <Text
+              className={`text-xs ${activeTab === tab.id ? 'font-bold text-[#1e3a5f] dark:text-white' : 'font-medium text-slate-500 dark:text-slate-400'}`}
+            >
               {tab.label}
             </Text>
           </TouchableOpacity>
@@ -61,88 +63,16 @@ export function DetailView({ inst, onBack }: DetailViewProps) {
 
       {/* Tab content */}
       <ScrollView
-        style={{ flex: 1 }}
-        contentContainerStyle={styles.tabContent}
+        className="flex-1 bg-slate-50 dark:bg-slate-900"
+        contentContainerClassName="p-4"
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
         {activeTab === 'overview' && <OverviewTab inst={inst} />}
         {activeTab === 'summary' && <SummaryTab inst={inst} />}
         {activeTab === 'date2date' && <DateToDateTab />}
-        <View style={{ height: 24 }} />
+        <View className="h-6" />
       </ScrollView>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  header: {
-    backgroundColor: '#fff',
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e2e8f0',
-  },
-  backBtn: {
-    width: 36,
-    height: 36,
-    backgroundColor: '#f1f5f9',
-    borderRadius: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexShrink: 0,
-  },
-  backIcon: {
-    fontSize: 18,
-    color: '#334155',
-    lineHeight: 22,
-  },
-  headerTitle: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: '#0f172a',
-  },
-  headerMeta: {
-    fontSize: 11,
-    color: '#94a3b8',
-    marginTop: 1,
-  },
-  tabBar: {
-    backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e2e8f0',
-    flexShrink: 0,
-    flexGrow: 0,
-  },
-  tabBarContent: {
-    paddingHorizontal: 4,
-  },
-  tab: {
-    paddingHorizontal: 14,
-    paddingVertical: 11,
-    borderBottomWidth: 2,
-    borderBottomColor: 'transparent',
-  },
-  tabActive: {
-    borderBottomColor: '#1e3a5f',
-  },
-  tabText: {
-    fontSize: 12,
-    fontWeight: '500',
-    color: '#64748b',
-    whiteSpace: 'nowrap',
-  } as any,
-  tabTextActive: {
-    color: '#1e3a5f',
-    fontWeight: '700',
-  },
-  tabContent: {
-    padding: 16,
-  },
-});
