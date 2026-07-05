@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View, Text, TouchableOpacity, Modal, Pressable, Switch } from 'react-native';
+import { View, Text, TouchableOpacity, Modal, Pressable } from 'react-native';
 import { useRouter } from 'expo-router';
 import type { Institute } from '@/types';
 import { PERIOD_KEYS, PERIOD_LABELS, fmt } from '@/utils/formatters';
@@ -22,7 +22,7 @@ const STAT_ICONS = ['💰', '✅', '⚠️', '🧾', '📝', '💳'] as const;
 export function SummarySection({ institutes, periodIdx, setPeriodIdx }: SummarySectionProps) {
   const router = useRouter();
   const { data: profile } = useGetProfileQuery();
-  const { isDark, toggleDarkMode } = useDarkMode();
+  const { themeMode, setThemeMode } = useDarkMode();
   const { handleLogout: doLogout, loggingOut } = useLogout();
   const [menuVisible, setMenuVisible] = useState(false);
 
@@ -137,14 +137,34 @@ export function SummarySection({ institutes, periodIdx, setPeriodIdx }: SummaryS
             <View className="flex-row items-center justify-between px-3.5 py-3">
               <View className="flex-row items-center">
                 <Text className="mr-2.5 text-base">🌙</Text>
-                <Text className="text-[13px] font-semibold text-slate-700 dark:text-slate-200">Dark Mode</Text>
+                <Text className="text-[13px] font-semibold text-slate-700 dark:text-slate-200">Appearance</Text>
               </View>
-              <Switch
-                value={isDark}
-                onValueChange={toggleDarkMode}
-                trackColor={{ false: '#e2e8f0', true: '#1e3a5f' }}
-                thumbColor="#fff"
-              />
+              <View className="flex-row rounded-full bg-slate-100 p-0.5 dark:bg-slate-900">
+                {(
+                  [
+                    { key: 'system', icon: '⚙️' },
+                    { key: 'light', icon: '☀️' },
+                    { key: 'dark', icon: '🌙' },
+                  ] as const
+                ).map((opt) => {
+                  const active = themeMode === opt.key;
+                  return (
+                    <TouchableOpacity
+                      key={opt.key}
+                      onPress={() => setThemeMode(opt.key)}
+                      activeOpacity={0.75}
+                      className={`h-6 w-6 items-center justify-center rounded-full ${active ? 'bg-white dark:bg-slate-700' : ''}`}
+                      style={
+                        active
+                          ? { shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.15, shadowRadius: 2, elevation: 1 }
+                          : undefined
+                      }
+                    >
+                      <Text style={{ fontSize: 10 }}>{opt.icon}</Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
             </View>
 
             <TouchableOpacity

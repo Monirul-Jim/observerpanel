@@ -6,10 +6,10 @@ import {
   TouchableOpacity,
   Platform,
   ActivityIndicator,
-  Switch,
   TextInput,
   Modal,
   Pressable,
+  useWindowDimensions,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
@@ -66,20 +66,25 @@ const FIELDS: { label: string; key: FieldKey; keyboardType?: 'email-address' | '
 export default function ProfileScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const { height: windowHeight } = useWindowDimensions();
   const { data: user, isLoading: loadingProfile } = useGetProfileQuery();
-  const { isDark, toggleDarkMode } = useDarkMode();
+  const { themeMode, setThemeMode } = useDarkMode();
   const { handleLogout, loggingOut } = useLogout();
   const [submitChangeRequest, { isLoading: saving }] = useSubmitProfileChangeRequestMutation();
   const headerTopPad = Platform.OS === 'web' ? 0 : insets.top;
 
   const [statusModalVisible, setStatusModalVisible] = useState(false);
-  const [fetchChangeRequests, { data: changeRequests, isFetching: loadingRequests }] =
+  const [fetchChangeRequests, { data: changeRequests, isFetching: loadingRequests, isError: requestsError, error: requestsErrorDetail }] =
     useLazyGetProfileChangeRequestsQuery();
 
   const openStatusModal = () => {
     setStatusModalVisible(true);
     fetchChangeRequests();
   };
+
+  if (requestsErrorDetail) {
+    console.log('[ProfileChangeRequests] fetch failed:', JSON.stringify(requestsErrorDetail));
+  }
 
   const [editMode, setEditMode] = useState(false);
   const [form, setForm] = useState<Record<FieldKey, string>>({
@@ -297,17 +302,44 @@ export default function ProfileScreen() {
               className="mt-4 rounded-2xl bg-white p-4 dark:bg-slate-800"
               style={{ shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.08, shadowRadius: 8, elevation: 3 }}
             >
-              <View className="flex-row items-center justify-between">
-                <View className="flex-row items-center">
-                  <Text className="mr-2.5 text-base">🌙</Text>
-                  <Text className="text-[13px] font-semibold text-slate-700 dark:text-slate-200">Dark Mode</Text>
-                </View>
-                <Switch
-                  value={isDark}
-                  onValueChange={toggleDarkMode}
-                  trackColor={{ false: '#e2e8f0', true: '#1e3a5f' }}
-                  thumbColor="#fff"
-                />
+              <View className="mb-2.5 flex-row items-center">
+                <Text className="mr-2.5 text-base">🌙</Text>
+                <Text className="text-[13px] font-semibold text-slate-700 dark:text-slate-200">Appearance</Text>
+              </View>
+              <View className="flex-row rounded-xl bg-slate-100 p-1 dark:bg-slate-900">
+                {(
+                  [
+                    { key: 'system', label: 'System', icon: '⚙️' },
+                    { key: 'light', label: 'Light', icon: '☀️' },
+                    { key: 'dark', label: 'Dark', icon: '🌙' },
+                  ] as const
+                ).map((opt) => {
+                  const active = themeMode === opt.key;
+                  return (
+                    <TouchableOpacity
+                      key={opt.key}
+                      onPress={() => setThemeMode(opt.key)}
+                      activeOpacity={0.8}
+                      className={`flex-1 items-center rounded-lg py-2 ${active ? 'bg-white dark:bg-slate-700' : ''}`}
+                      style={
+                        active
+                          ? { shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.1, shadowRadius: 3, elevation: 2 }
+                          : undefined
+                      }
+                    >
+                      <Text className="text-sm">{opt.icon}</Text>
+                      <Text
+                        className={`mt-0.5 text-[11px] ${
+                          active
+                            ? 'font-bold text-[#1e3a5f] dark:text-white'
+                            : 'font-medium text-slate-500 dark:text-slate-400'
+                        }`}
+                      >
+                        {opt.label}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
               </View>
             </View>
 
@@ -343,15 +375,35 @@ export default function ProfileScreen() {
           onPress={() => setStatusModalVisible(false)}
         >
           <View
-            className="max-h-[80%] w-full max-w-[380px] rounded-2xl bg-white p-4 dark:bg-slate-800"
-            style={{ shadowColor: '#000', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.25, shadowRadius: 20, elevation: 12 }}
+            className="w-full max-w-[380px] rounded-2xl bg-white p-4 dark:bg-slate-800"
+            style={{
+              shadowColor: '#000',
+              shadowOffset: { width: 0, height: 8 },
+              shadowOpacity: 0.25,
+              shadowRadius: 20,
+              elevation: 12,
+            }}
           >
             <Text className="mb-3 text-sm font-bold text-slate-900 dark:text-white">Change Request Status</Text>
 
-            <ScrollView showsVerticalScrollIndicator={false}>
+            {/* A flex-1 ScrollView inside an auto-height parent collapses to
+                0 on native — bound it with an explicit pixel maxHeight instead,
+                leaving room for the title and Close button. */}
+            <ScrollView style={{ maxHeight: windowHeight * 0.55 }} showsVerticalScrollIndicator={false}>
               {loadingRequests ? (
                 <View className="items-center py-8">
                   <ActivityIndicator color="#1e3a5f" size="small" />
+                </View>
+              ) : requestsError ? (
+                <View className="items-center py-8">
+                  <Text className="mb-3 text-sm text-slate-400">Failed to load status</Text>
+                  <TouchableOpacity
+                    onPress={() => fetchChangeRequests()}
+                    activeOpacity={0.8}
+                    className="rounded-xl bg-[#1e3a5f] px-4 py-2.5"
+                  >
+                    <Text className="text-sm font-bold text-white">Retry</Text>
+                  </TouchableOpacity>
                 </View>
               ) : !changeRequests || changeRequests.length === 0 ? (
                 <View className="items-center py-8">

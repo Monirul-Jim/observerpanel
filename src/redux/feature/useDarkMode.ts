@@ -1,18 +1,21 @@
-import { useColorScheme } from 'nativewind';
+import { useColorScheme as useNativewindColorScheme } from 'nativewind';
+import { useColorScheme as useSystemColorScheme } from 'react-native';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { setMode, useThemeMode } from './themeSlice';
 
 export function useDarkMode() {
   const dispatch = useAppDispatch();
   const themeMode = useAppSelector(useThemeMode);
-  const { setColorScheme } = useColorScheme();
-  const isDark = themeMode === 'dark';
+  const systemScheme = useSystemColorScheme();
+  const { setColorScheme } = useNativewindColorScheme();
+  const isDark = themeMode === 'system' ? systemScheme === 'dark' : themeMode === 'dark';
 
-  const toggleDarkMode = (value: boolean) => {
-    const mode = value ? 'dark' : 'light';
+  const setThemeMode = (mode: 'system' | 'light' | 'dark') => {
     dispatch(setMode(mode));
     setColorScheme(mode);
   };
 
-  return { isDark, toggleDarkMode };
+  const toggleDarkMode = (value: boolean) => setThemeMode(value ? 'dark' : 'light');
+
+  return { isDark, themeMode, setThemeMode, toggleDarkMode };
 }

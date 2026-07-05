@@ -8,7 +8,11 @@ export function ThemeSync() {
   const { setColorScheme } = useColorScheme();
 
   useEffect(() => {
-    setColorScheme(mode);
+    // Leave nativewind's colorScheme alone in "system" mode so it keeps
+    // tracking the OS appearance; only force it once the user picks explicitly.
+    if (mode !== 'system') {
+      setColorScheme(mode);
+    }
   }, [mode, setColorScheme]);
 
   return null;

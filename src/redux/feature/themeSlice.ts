@@ -1,14 +1,14 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "../store";
 
-type ThemeMode = "light" | "dark";
+type ThemeMode = "light" | "dark" | "system";
 
 type TThemeState = {
   mode: ThemeMode;
 };
 
 const initialState: TThemeState = {
-  mode: "light",
+  mode: "system",
 };
 
 const themeSlice = createSlice({
