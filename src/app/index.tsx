@@ -43,7 +43,7 @@ export default function LoginScreen() {
     handleSubmit,
     formState: { errors },
   } = useForm<LoginFormData>({
-    defaultValues: { email: "rahimhossain33455@gmail.com", password: "123456" },
+    defaultValues: { email: "", password: "" },
   });
 
   const onSubmit = async (data: LoginFormData) => {

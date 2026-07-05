@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "observerpanel",
+    "name": "Observer Panel",
     "slug": "observerpanel",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -23,7 +23,7 @@
     "web": {
       "bundler": "metro",
       "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/icon.png"
     },
     "plugins": [
       "expo-router",
@@ -50,7 +50,7 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "95d01102-89b4-4ce2-9c2c-7e1c047b1bf2"
+        "projectId": "44d131de-5171-4127-ab10-e88c0a71a924"
       }
     }
   }
