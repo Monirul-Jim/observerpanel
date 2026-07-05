@@ -1,18 +1,28 @@
 import { useState, useMemo, useEffect } from 'react';
-import { View, Text, FlatList, Platform, RefreshControl } from 'react-native';
+import { View, Text, FlatList, Platform, RefreshControl, ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import type { Institute, LayerFilter } from '@/types';
+import type { LayerFilter } from '@/types';
 import { HIERARCHY, OBSERVER } from '@/data/mock-data';
 import { SummarySection } from '@/components/panel/SummarySection';
 import { FilterBar } from '@/components/panel/FilterBar';
+import { PeriodTabs } from '@/components/panel/PeriodTabs';
 import { InstituteCard } from '@/components/panel/InstituteCard';
 import { DetailView } from '@/components/panel/detail/DetailView';
+import { usePanelNav } from '@/context/PanelNavContext';
 import { useGetInstituteInfoQuery } from '@/redux/api/authApi';
 
 export default function PanelScreen() {
   const insets = useSafeAreaInsets();
+  const { activeTab } = usePanelNav();
 
-  const [selectedInst, setSelectedInst] = useState<Institute | null>(null);
+  const [selectedInstId, setSelectedInstId] = useState<number | null>(null);
+
+  // Tapping Home/Institutes in the bottom nav while a detail view is open
+  // should back out of it, since the nav now stays visible there too.
+  useEffect(() => {
+    setSelectedInstId(null);
+  }, [activeTab]);
+
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
@@ -59,68 +69,87 @@ export default function PanelScreen() {
 
   return (
     <View className={`flex-1 bg-slate-50 dark:bg-slate-900 ${Platform.OS === 'web' ? 'items-center' : ''}`}>
-      {selectedInst ? (
+      {selectedInstId ? (
         /* ── Detail View ───────────────────────────── */
         <View className="flex-1 bg-white dark:bg-slate-900" style={{ paddingTop: headerTopPad }}>
-          <DetailView inst={selectedInst} onBack={() => setSelectedInst(null)} />
+          <DetailView instId={selectedInstId} onBack={() => setSelectedInstId(null)} />
         </View>
       ) : (
-        /* ── List View ─────────────────────────────── */
+        /* ── Home / Institutes tabs ────────────────── */
         <View className="w-full max-w-[430px] flex-1 overflow-hidden bg-slate-50 dark:bg-slate-900">
-          <FlatList
-            className="flex-1"
-            data={institutes}
-            keyExtractor={(inst) => String(inst.id)}
-            renderItem={({ item }) => (
-              <View className="px-4">
-                <InstituteCard inst={item} periodIdx={periodIdx} onPress={setSelectedInst} />
-              </View>
-            )}
-            contentContainerStyle={{ paddingBottom: bottomPad + 20 }}
-            showsVerticalScrollIndicator={false}
-            keyboardShouldPersistTaps="handled"
-            refreshControl={
-              <RefreshControl refreshing={isFetching} onRefresh={refetch} tintColor="#1e3a5f" />
-            }
-            windowSize={7}
-            maxToRenderPerBatch={8}
-            initialNumToRender={8}
-            removeClippedSubviews={Platform.OS !== 'web'}
-            ListHeaderComponent={
-              <>
-                {/* Dark header with top safe-area padding */}
-                <View className="bg-[#1e3a5f]" style={{ paddingTop: headerTopPad }}>
-                  <SummarySection
-                    institutes={institutes}
-                    periodIdx={periodIdx}
-                    setPeriodIdx={setPeriodIdx}
-                  />
-                </View>
-
-                <FilterBar
-                  search={search}
-                  onSearchChange={setSearch}
-                  visibleLayers={visibleLayers}
-                  layerFilter={layerFilter}
-                  onLayerLevelChange={handleLayerLevelChange}
-                  onLayerValueChange={handleLayerValueChange}
-                  layerValues={layerValues}
-                  statusFilter={statusFilter}
-                  onStatusFilterChange={setStatusFilter}
+          {activeTab === 'home' ? (
+            // Dark background fills the whole tab so short content never
+            // reveals white space beneath it
+            <View className="flex-1 bg-[#1e3a5f]">
+              <ScrollView
+                className="flex-1"
+                showsVerticalScrollIndicator={false}
+                contentContainerStyle={{ flexGrow: 1, paddingTop: headerTopPad, paddingBottom: bottomPad + 20 }}
+                refreshControl={
+                  <RefreshControl refreshing={isFetching} onRefresh={refetch} tintColor="#ffffff" />
+                }
+              >
+                <SummarySection
+                  institutes={institutes}
+                  periodIdx={periodIdx}
+                  setPeriodIdx={setPeriodIdx}
                 />
+              </ScrollView>
+            </View>
+          ) : (
+            <FlatList
+              className="flex-1"
+              data={institutes}
+              keyExtractor={(inst) => String(inst.id)}
+              renderItem={({ item }) => (
+                <View className="px-4">
+                  <InstituteCard inst={item} periodIdx={periodIdx} onPress={setSelectedInstId} />
+                </View>
+              )}
+              contentContainerStyle={{ paddingBottom: bottomPad + 20 }}
+              showsVerticalScrollIndicator={false}
+              keyboardShouldPersistTaps="handled"
+              refreshControl={
+                <RefreshControl refreshing={isFetching} onRefresh={refetch} tintColor="#1e3a5f" />
+              }
+              windowSize={7}
+              maxToRenderPerBatch={8}
+              initialNumToRender={8}
+              removeClippedSubviews={Platform.OS !== 'web'}
+              ListHeaderComponent={
+                <>
+                  <View
+                    className="border-b border-slate-200 bg-white px-4 pb-2 dark:border-slate-700 dark:bg-slate-800"
+                    style={{ paddingTop: headerTopPad + 12 }}
+                  >
+                    <PeriodTabs periodIdx={periodIdx} setPeriodIdx={setPeriodIdx} variant="light" />
+                  </View>
 
-                <Text className="mb-3 px-4 pt-3 text-base font-bold text-slate-700 dark:text-slate-200">
-                  {institutes.length} institution{institutes.length !== 1 ? 's' : ''} found
-                </Text>
-              </>
-            }
-            ListEmptyComponent={
-              <View className="items-center px-4 py-12">
-                <Text className="mb-2 text-3xl">🔍</Text>
-                <Text className="text-sm text-slate-400">No institutions found</Text>
-              </View>
-            }
-          />
+                  <FilterBar
+                    search={search}
+                    onSearchChange={setSearch}
+                    visibleLayers={visibleLayers}
+                    layerFilter={layerFilter}
+                    onLayerLevelChange={handleLayerLevelChange}
+                    onLayerValueChange={handleLayerValueChange}
+                    layerValues={layerValues}
+                    statusFilter={statusFilter}
+                    onStatusFilterChange={setStatusFilter}
+                  />
+
+                  <Text className="mb-3 px-4 pt-3 text-base font-bold text-slate-700 dark:text-slate-200">
+                    {institutes.length} institution{institutes.length !== 1 ? 's' : ''} found
+                  </Text>
+                </>
+              }
+              ListEmptyComponent={
+                <View className="items-center px-4 py-12">
+                  <Text className="mb-2 text-3xl">🔍</Text>
+                  <Text className="text-sm text-slate-400">No institutions found</Text>
+                </View>
+              }
+            />
+          )}
         </View>
       )}
     </View>

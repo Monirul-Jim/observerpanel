@@ -283,3 +283,5 @@ Division  (বিভাগ)
 7. `status=due` filter এর জন্য threshold: `dueAmount > 1000000` (১০ লাখ টাকা)
 8. `lastTransactionTime` format হবে `hh:mm AM/PM` (যেমন `11:42 AM`)
 9. Institute এর payment/collection data **Fees Management**, **Online Admission**, এবং **Open Payment** — এই তিনটি online payment report থেকেই aggregate করে Observer Portal এ পাঠাতে হবে
+<!-- eas build --platform android --profile production -->
+<!-- eas update --branch production --environment production --message "fixing api env" -->

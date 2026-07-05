@@ -5,6 +5,7 @@ import type { Institute } from '@/types';
 import { PERIOD_KEYS, PERIOD_LABELS, fmt } from '@/utils/formatters';
 import { OBSERVER } from '@/data/mock-data';
 import { Avatar } from './Avatar';
+import { PeriodTabs } from './PeriodTabs';
 import { useGetProfileQuery } from '@/redux/api/authApi';
 import { useLogout } from '@/redux/feature/useLogout';
 import { useDarkMode } from '@/redux/feature/useDarkMode';
@@ -61,7 +62,7 @@ export function SummarySection({ institutes, periodIdx, setPeriodIdx }: SummaryS
   ];
 
   return (
-    <View className="px-4 pt-4">
+    <View className="flex-1 px-4 pt-4">
       {/* Observer Info */}
       <View className="mb-4 flex-row items-center justify-between">
         <View className="flex-1 pr-3">
@@ -162,58 +163,42 @@ export function SummarySection({ institutes, periodIdx, setPeriodIdx }: SummaryS
       </Modal>
 
       {/* Period Tabs */}
-      <View className="mb-3 flex-row rounded-[10px] bg-white/10 p-1">
-        {PERIOD_LABELS.map((lbl, i) => (
-          <TouchableOpacity
-            key={i}
-            onPress={() => setPeriodIdx(i)}
-            activeOpacity={0.8}
-            className={`flex-1 items-center rounded-lg py-2 ${periodIdx === i ? 'bg-white' : ''}`}
-            style={
-              periodIdx === i
-                ? { shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.15, shadowRadius: 3, elevation: 2 }
-                : undefined
-            }
-          >
-            <Text
-              className={`text-[11px] ${periodIdx === i ? 'font-bold text-[#1e3a5f]' : 'font-medium text-white/65'}`}
-            >
-              {lbl}
-            </Text>
-          </TouchableOpacity>
-        ))}
+      <View className="mb-3">
+        <PeriodTabs periodIdx={periodIdx} setPeriodIdx={setPeriodIdx} variant="dark" />
       </View>
 
-      {/* Today/period collection – standalone highlight box */}
-      <View className="mb-2 rounded-xl border border-white/10 bg-white/[0.07] p-3">
-        <View className="flex-row items-center justify-between">
-          <View className="flex-row items-center">
-            <View className="mr-2.5 h-8 w-8 items-center justify-center rounded-full bg-white/10">
-              <Text className="text-sm">📅</Text>
+      {/* Today/period collection + stats grid — stretched to fill remaining height */}
+      <View className="flex-1 justify-between gap-2 pb-2">
+        <View className="justify-center rounded-xl border border-white/10 bg-white/[0.07] p-3" style={{ flex: 1.6 }}>
+          <View className="flex-row items-center justify-between">
+            <View className="flex-row items-center">
+              <View className="mr-2.5 h-10 w-10 items-center justify-center rounded-full bg-white/10">
+                <Text className="text-base">📅</Text>
+              </View>
+              <Text className="text-[13px] font-medium text-white/60">
+                {PERIOD_LABELS[periodIdx]} Collection
+              </Text>
             </View>
-            <Text className="text-[11px] font-medium text-white/60">
-              {PERIOD_LABELS[periodIdx]} Collection
-            </Text>
+            <Text style={{ fontSize: 22, fontWeight: '800', color: '#4ade80' }}>{fmt(totals.periodFee)}</Text>
           </View>
-          <Text style={{ fontSize: 17, fontWeight: '800', color: '#4ade80' }}>{fmt(totals.periodFee)}</Text>
         </View>
-      </View>
 
-      {/* Stats Grid – 2 columns × 3 rows */}
-      <View className="mb-2 flex-row gap-2">
-        {stats.slice(0, 2).map((s, i) => (
-          <StatCard key={i} {...s} icon={STAT_ICONS[i]} accent={STAT_ACCENTS[i]} />
-        ))}
-      </View>
-      <View className="mb-2 flex-row gap-2">
-        {stats.slice(2, 4).map((s, i) => (
-          <StatCard key={i + 2} {...s} icon={STAT_ICONS[i + 2]} accent={STAT_ACCENTS[i + 2]} />
-        ))}
-      </View>
-      <View className="mb-4 flex-row gap-2">
-        {stats.slice(4, 6).map((s, i) => (
-          <StatCard key={i + 4} {...s} icon={STAT_ICONS[i + 4]} accent={STAT_ACCENTS[i + 4]} />
-        ))}
+        {/* Stats Grid – 2 columns × 3 rows */}
+        <View className="flex-1 flex-row gap-2">
+          {stats.slice(0, 2).map((s, i) => (
+            <StatCard key={i} {...s} icon={STAT_ICONS[i]} accent={STAT_ACCENTS[i]} />
+          ))}
+        </View>
+        <View className="flex-1 flex-row gap-2">
+          {stats.slice(2, 4).map((s, i) => (
+            <StatCard key={i + 2} {...s} icon={STAT_ICONS[i + 2]} accent={STAT_ACCENTS[i + 2]} />
+          ))}
+        </View>
+        <View className="flex-1 flex-row gap-2">
+          {stats.slice(4, 6).map((s, i) => (
+            <StatCard key={i + 4} {...s} icon={STAT_ICONS[i + 4]} accent={STAT_ACCENTS[i + 4]} />
+          ))}
+        </View>
       </View>
     </View>
   );
@@ -229,7 +214,7 @@ interface StatCardProps {
 
 function StatCard({ icon, value, label, accent, sub }: StatCardProps) {
   return (
-    <View className="flex-1 rounded-xl border border-white/10 bg-white/[0.07] p-2.5">
+    <View className="flex-1 justify-center rounded-xl border border-white/10 bg-white/[0.07] p-2.5">
       <View className="mb-1.5 h-6 w-6 items-center justify-center rounded-full bg-white/10">
         <Text className="text-xs">{icon}</Text>
       </View>

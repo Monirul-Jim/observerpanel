@@ -2,7 +2,7 @@
 
 # dependencies
 node_modules/
-ServiceAccount.json
+
 # Expo
 .expo/
 dist/
@@ -35,9 +35,10 @@ yarn-error.*
 
 # typescript
 *.tsbuildinfo
-
-example
+.env
+app-example
 
 # generated native folders
 /ios
 /android
+text.txt

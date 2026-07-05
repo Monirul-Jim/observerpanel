@@ -70,6 +70,7 @@ export const baseApi = createApi({
   baseQuery: baseQueryWithRefresh,
   tagTypes: [
     "AuthUser",
+    "ProfileChangeRequest",
     "InstitutePackage",
     "Users",
     "Institute",

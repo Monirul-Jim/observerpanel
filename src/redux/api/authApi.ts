@@ -37,11 +37,70 @@ type TProfileResponse = {
   };
 };
 
+type TInstituteDetailResponse = {
+  payload: {
+    data: Institute;
+  };
+};
+
+export type TDayCollection = {
+  date: string;
+  amount: number;
+};
+
+export type TTransactionsData = {
+  from: string;
+  to: string;
+  totalAmount: number;
+  data: TDayCollection[];
+};
+
+type TTransactionsResponse = {
+  payload: {
+    data: TTransactionsData;
+  };
+};
+
+export type TGetTransactionsParams = {
+  id: number;
+  from: string;
+  to: string;
+};
+
 export type TGetInstitutesParams = {
   search?: string;
   status?: string;
   layer_level?: string;
   layer_value?: string;
+};
+
+export type TProfileChangeRequest = {
+  id: number;
+  observer_id: number;
+  changes: Record<string, string>;
+  original: Record<string, string>;
+  status: "pending" | "approved" | "rejected";
+  reviewed_by: number | null;
+  reviewed_at: string | null;
+  rejection_reason: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+type TSubmitChangeRequestResponse = {
+  payload: {
+    data: {
+      status: string;
+      message: string;
+      request: TProfileChangeRequest;
+    };
+  };
+};
+
+type TChangeRequestsResponse = {
+  payload: {
+    data: TProfileChangeRequest[];
+  };
 };
 
 const authApi = baseApi.injectEndpoints({
@@ -69,21 +128,39 @@ const authApi = baseApi.injectEndpoints({
       providesTags: ["Institute"],
       keepUnusedDataFor: 300,
     }),
+    getInstituteDetail: builder.query<Institute, number>({
+      query: (id) => `/observer/institutes/${id}`,
+      transformResponse: (res: TInstituteDetailResponse) => res.payload.data,
+      providesTags: (_result, _error, id) => [{ type: "Institute", id }],
+    }),
+    getInstituteTransactions: builder.query<TTransactionsData, TGetTransactionsParams>({
+      query: ({ id, from, to }) => ({
+        url: `/observer/institutes/${id}/transactions`,
+        params: { from, to },
+      }),
+      transformResponse: (res: TTransactionsResponse) => res.payload.data,
+    }),
     getProfile: builder.query<TAuthUser, void>({
       query: () => "/observer/profile",
       transformResponse: (res: TProfileResponse) => res.payload.data.user,
       providesTags: ["AuthUser"],
     }),
-    updateProfile: builder.mutation<
-      { payload: { data: { user: TAuthUser } } },
-      { id: number; formData: FormData }
+    submitProfileChangeRequest: builder.mutation<
+      { status: string; message: string; request: TProfileChangeRequest },
+      FormData
     >({
-      query: ({ id, formData }) => ({
-        url: `/observer/update-profile/${id}`,
+      query: (formData) => ({
+        url: "/observer/profile/change-request",
         method: "POST",
         body: formData,
       }),
-      invalidatesTags: ["AuthUser"],
+      transformResponse: (res: TSubmitChangeRequestResponse) => res.payload.data,
+      invalidatesTags: ["ProfileChangeRequest"],
+    }),
+    getProfileChangeRequests: builder.query<TProfileChangeRequest[], void>({
+      query: () => "/observer/profile/change-requests",
+      transformResponse: (res: TChangeRequestsResponse) => res.payload.data,
+      providesTags: ["ProfileChangeRequest"],
     }),
     forgotPassword: builder.mutation<unknown, { email: string }>({
       query: ({ email }) => {
@@ -103,7 +180,10 @@ export const {
   useLoginUserMutation,
   useLogOutUserMutation,
   useGetInstituteInfoQuery,
+  useGetInstituteDetailQuery,
+  useLazyGetInstituteTransactionsQuery,
   useGetProfileQuery,
-  useUpdateProfileMutation,
+  useSubmitProfileChangeRequestMutation,
+  useLazyGetProfileChangeRequestsQuery,
   useForgotPasswordMutation,
 } = authApi;

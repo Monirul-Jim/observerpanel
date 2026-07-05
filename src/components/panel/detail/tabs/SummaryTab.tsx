@@ -17,6 +17,13 @@ export function SummaryTab({ inst }: { inst: Institute }) {
     { label: 'Collected', value: fmtFull(inst.totalCollected), accent: '#16a34a' },
     { label: 'Due', value: fmtFull(inst.dueAmount), accent: '#ef4444' },
     { label: 'Collection Rate', value: `${inst.collectionRate}%` },
+    ...(inst?.paymentSources
+      ? [
+          { label: 'Fees Management', value: fmtFull(inst.paymentSources.feesManagement.collected) },
+          { label: 'Online Admission', value: fmtFull(inst.paymentSources.onlineAdmission.collected) },
+          { label: 'Open Payment', value: fmtFull(inst.paymentSources.openPayment.collected) },
+        ]
+      : []),
     { label: 'Status', value: inst.status === 'active' ? 'Active ✓' : 'Inactive' },
   ];
 

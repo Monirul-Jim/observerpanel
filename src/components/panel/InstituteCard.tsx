@@ -7,7 +7,7 @@ import { CollectionBar } from './CollectionBar';
 interface InstituteCardProps {
   inst: Institute;
   periodIdx: number;
-  onPress: (inst: Institute) => void;
+  onPress: (id: number) => void;
 }
 
 export function InstituteCard({ inst, periodIdx, onPress }: InstituteCardProps) {
@@ -97,7 +97,7 @@ export function InstituteCard({ inst, periodIdx, onPress }: InstituteCardProps) 
               {inst.lastTransaction} · {inst.lastTransactionTime}
             </Text>
           </Text>
-          <Pressable onPress={() => onPress(inst)} hitSlop={8}>
+          <Pressable onPress={() => onPress(inst.id)} hitSlop={8}>
             <Text className="text-[11px] font-bold text-blue-500">Details →</Text>
           </Pressable>
         </View>
