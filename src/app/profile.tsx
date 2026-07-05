@@ -10,8 +10,10 @@ import {
   Modal,
   Pressable,
   useWindowDimensions,
+  RefreshControl,
 } from 'react-native';
 import { useRouter } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from 'expo-file-system/legacy';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -67,8 +69,8 @@ export default function ProfileScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { height: windowHeight } = useWindowDimensions();
-  const { data: user, isLoading: loadingProfile } = useGetProfileQuery();
-  const { themeMode, setThemeMode } = useDarkMode();
+  const { data: user, isLoading: loadingProfile, refetch, isFetching } = useGetProfileQuery();
+  const { themeMode, setThemeMode, isDark } = useDarkMode();
   const { handleLogout, loggingOut } = useLogout();
   const [submitChangeRequest, { isLoading: saving }] = useSubmitProfileChangeRequestMutation();
   const headerTopPad = Platform.OS === 'web' ? 0 : insets.top;
@@ -246,6 +248,14 @@ export default function ProfileScreen() {
         contentContainerClassName="p-4"
         contentContainerStyle={{ paddingBottom: insets.bottom + 24 }}
         showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={isFetching && !loadingProfile}
+            onRefresh={refetch}
+            colors={['#1e3a5f']}
+            tintColor={isDark ? '#93c5fd' : '#1e3a5f'}
+          />
+        }
       >
         <View
           className="rounded-2xl bg-white p-4 dark:bg-slate-800"
@@ -372,7 +382,6 @@ export default function ProfileScreen() {
       >
         <Pressable
           style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.45)', justifyContent: 'center', alignItems: 'center', padding: 20 }}
-          onPress={() => setStatusModalVisible(false)}
         >
           <View
             className="w-full max-w-[380px] rounded-2xl bg-white p-4 dark:bg-slate-800"
@@ -384,7 +393,17 @@ export default function ProfileScreen() {
               elevation: 12,
             }}
           >
-            <Text className="mb-3 text-sm font-bold text-slate-900 dark:text-white">Change Request Status</Text>
+            {/* Modal Header with close X button */}
+            <View className="mb-3 flex-row items-center justify-between">
+              <Text className="text-sm font-bold text-slate-900 dark:text-white">Change Request Status</Text>
+              <TouchableOpacity
+                onPress={() => setStatusModalVisible(false)}
+                activeOpacity={0.7}
+                className="h-7 w-7 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-700"
+              >
+                <Ionicons name="close" size={16} color={isDark ? '#cbd5e1' : '#475569'} />
+              </TouchableOpacity>
+            </View>
 
             {/* A flex-1 ScrollView inside an auto-height parent collapses to
                 0 on native — bound it with an explicit pixel maxHeight instead,
@@ -450,14 +469,6 @@ export default function ProfileScreen() {
                 })
               )}
             </ScrollView>
-
-            <TouchableOpacity
-              onPress={() => setStatusModalVisible(false)}
-              activeOpacity={0.7}
-              className="mt-3 items-center rounded-xl bg-slate-100 py-2.5 dark:bg-slate-700"
-            >
-              <Text className="text-[13px] font-bold text-slate-600 dark:text-slate-300">Close</Text>
-            </TouchableOpacity>
           </View>
         </Pressable>
       </Modal>

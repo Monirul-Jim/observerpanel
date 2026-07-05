@@ -2,12 +2,14 @@ import { showMessage } from "@/components/Toast/message";
 import { useLoginUserMutation } from "@/redux/api/authApi";
 import { setUser } from "@/redux/feature/authSlice";
 import { useAppSelector } from "@/redux/hooks";
+import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
+  Linking,
   Platform,
   ScrollView,
   Text,
@@ -22,6 +24,15 @@ type LoginFormData = {
   email: string;
   password: string;
 };
+
+const socials = [
+  { icon: "logo-linkedin", url: "https://www.linkedin.com/company/automateitbd" },
+  { icon: "logo-facebook", url: "https://www.facebook.com/automateitbd" },
+  { icon: "logo-youtube", url: "https://www.youtube.com/@automateitlimited" },
+  { icon: "call", url: "tel:+8801335127799" }, // Sorasori Call / Direct Mobile Call
+  { icon: "headset", url: "tel:+8809613241234" }, // IP Call Helpline
+  { icon: "logo-whatsapp", url: "https://wa.me/+8801335127799" }, // WhatsApp
+] as const;
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -254,6 +265,20 @@ export default function LoginScreen() {
           <Text className="mt-3.5 text-center text-[11px] text-slate-400">
             Use any valid email and password to continue
           </Text>
+        </View>
+
+        {/* ── Social / Support Links ────────────────── */}
+        <View className="flex-row items-center justify-center mt-6" style={{ gap: 8 }}>
+          {socials.map((s) => (
+            <TouchableOpacity
+              key={s.icon}
+              onPress={() => Linking.openURL(s.url)}
+              className="w-9 h-9 rounded-full bg-indigo-600 items-center justify-center"
+              activeOpacity={0.8}
+            >
+              <Ionicons name={s.icon as any} size={16} color="white" />
+            </TouchableOpacity>
+          ))}
         </View>
 
         {/* ── Footer ───────────────────────────────── */}
