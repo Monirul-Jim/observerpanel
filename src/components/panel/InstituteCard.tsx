@@ -31,7 +31,7 @@ export function InstituteCard({ inst, periodIdx, onPress }: InstituteCardProps) 
           <View className="min-w-0 flex-1 pr-3">
             <View className="mb-1.5 flex-row items-center">
               <StatusDot active={inst.status === 'active'} />
-              <Text selectable className="text-[10px] font-medium text-slate-400 dark:text-slate-500">{inst.code}</Text>
+              <Text selectable className="text-[10px] font-medium text-slate-400 dark:text-slate-500">{inst.institute_id}</Text>
               <View className="ml-1.5 rounded-full bg-slate-100 px-2 py-0.5 dark:bg-slate-700">
                 <Text selectable className="text-[9px] font-semibold text-slate-500 dark:text-slate-300">{inst.type}</Text>
               </View>
@@ -91,14 +91,19 @@ export function InstituteCard({ inst, periodIdx, onPress }: InstituteCardProps) 
 
         {/* Footer */}
         <View className="mt-3 flex-row items-center justify-between border-t border-slate-100 pt-2.5 dark:border-slate-700">
-          <Text selectable className="text-[10px] text-slate-400 dark:text-slate-500">
+          <Text
+            selectable
+            numberOfLines={1}
+            maxFontSizeMultiplier={1.2}
+            className="mr-2 flex-1 text-[10px] text-slate-400 dark:text-slate-500"
+          >
             Last txn:{' '}
             <Text selectable className="font-semibold text-slate-500 dark:text-slate-400">
               {inst.lastTransaction} · {inst.lastTransactionTime}
             </Text>
           </Text>
-          <Pressable onPress={() => onPress(inst.id)} hitSlop={8}>
-            <Text className="text-[11px] font-bold text-blue-500">Details →</Text>
+          <Pressable onPress={() => onPress(inst.id)} hitSlop={8} className="shrink-0">
+            <Text maxFontSizeMultiplier={1.2} className="text-[11px] font-bold text-blue-500">Details →</Text>
           </Pressable>
         </View>
       </View>

@@ -35,6 +35,7 @@ export interface Institute {
   id: number;
   name: string;
   code: string | number;
+  institute_id:string;
   type: string;
   branch: string | null;
   principal: string | null;

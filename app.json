@@ -52,6 +52,22 @@
       "eas": {
         "projectId": "44d131de-5171-4127-ab10-e88c0a71a924"
       }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/44d131de-5171-4127-ab10-e88c0a71a924",
+      "enabled": true,
+      "checkAutomatically": "ON_LOAD"
+    }
+  },
+  "submit": {
+    "production": {
+      "android": {
+        "serviceAccountKeyPath": "./ServiceAccount.json",
+        "track": "production"
+      }
     }
   }
 }
